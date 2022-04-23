@@ -1,2 +1,2 @@
 all:
-	gcc -Wall main.c operations.c -I headers/ -o main
+	gcc -Wall main.c operations.c utils.c -I headers/ -lm -o main
