@@ -111,3 +111,7 @@ void writeImage(char filename[], int **matrix_image, int rows, int columns)
     printf("Sauvegarde effectuée avec succès sous {%s}\n", filename);
     fclose(fptr);
 }
+
+void finTache(char tache_name[]){
+    printf("Fin de l'opération %s\n", tache_name);
+}

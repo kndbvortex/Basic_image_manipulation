@@ -241,7 +241,7 @@ int **egalisationHistogram(int **matrix_image, int rows, int columns)
 //                     }
 //                 }
 //             }
-                
+
 //         }
 //     }
 //     writeImage("images/morceau.pgm", matrix_image_trans, rows, columns);
@@ -267,46 +267,52 @@ int **transformation_par_log(int **matrix_image, int rows, int columns)
 
 int **rogner(int **matrix_image, int rows, int columns, int new_row, int new_columns)
 {
-    if(new_columns<=0 || new_row<=0)
+    if (new_columns <= 0 || new_row <= 0)
     {
         printf("Mauvaise dimension de rognage\n !!!");
         exit(EXIT_FAILURE);
     }
-    if(rows <= new_row && columns <= new_columns)
+    if (rows <= new_row && columns <= new_columns)
     {
         return matrix_image;
     }
     int **result_matrix = allocateMatrix(new_row, new_columns);
-    for(int i=0; i<new_row; i++){
-        for(int j=0; j<new_columns; j++){
+    for (int i = 0; i < new_row; i++)
+    {
+        for (int j = 0; j < new_columns; j++)
+        {
             result_matrix[i][j] = matrix_image[i][j];
         }
     }
     return result_matrix;
 }
 
-int **OULogique(int **matrix_image, int row1, int col1, int **bin_matrix, int row2, int col2){
+int **OULogique(int **matrix_image, int row1, int col1, int **bin_matrix, int row2, int col2)
+{
     bin_matrix = seuillage(bin_matrix, row2, col2, 127);
-    int min_row=row1, min_col=col1;
-    if(min_row > row2)
+    int min_row = row1, min_col = col1;
+    if (min_row > row2)
         min_row = row2;
-    if(min_col > col2)
+    if (min_col > col2)
         min_col = col2;
 
     int **ou_matrix = allocateMatrix(min_row, min_col);
-    for(int i=0; i<min_row; i++){
-        for(int j=0; j<min_col; j++){
+    for (int i = 0; i < min_row; i++)
+    {
+        for (int j = 0; j < min_col; j++)
+        {
             if (bin_matrix[i][j] == 255)
                 ou_matrix[i][j] = 255;
             else
                 ou_matrix[i][j] = matrix_image[i][j];
-        }   
+        }
     }
-    
+
     writeImage("images/output/testOU.pgm", ou_matrix, min_row, min_col);
 
     return ou_matrix;
 }
+
 int **ETLogique(int **matrix_image, int row1, int col1, int **bin_matrix, int row2, int col2)
 {
     bin_matrix = seuillage(bin_matrix, row2, col2, 127);
@@ -321,7 +327,7 @@ int **ETLogique(int **matrix_image, int row1, int col1, int **bin_matrix, int ro
     {
         for (int j = 0; j < min_col; j++)
         {
-            if(bin_matrix[i][j] == 0)
+            if (bin_matrix[i][j] == 0)
                 et_matrix[i][j] = 0;
             else
                 et_matrix[i][j] = matrix_image[i][j];
@@ -331,4 +337,113 @@ int **ETLogique(int **matrix_image, int row1, int col1, int **bin_matrix, int ro
     writeImage("images/output/testET.pgm", et_matrix, min_row, min_col);
 
     return et_matrix;
+}
+
+int **XORLogique(int **bin_image, int row1, int col1, int **bin_image2, int row2, int col2)
+{
+    bin_image = seuillage(bin_image, row1, col1, 127);
+    bin_image2 = seuillage(bin_image2, row2, col2, 127);
+    int min_row = row1, min_col = col1;
+    if (min_row > row2)
+        min_row = row2;
+    if (min_col > col2)
+        min_col = col2;
+    int **xor_matrix = allocateMatrix(min_row, min_col);
+    for(int i=0; i<min_row; i++){
+        for(int j=0; j<min_col; j++){
+            if(bin_image[i][j] != bin_image2[i][j]){
+                xor_matrix[i][j] = 0;
+            }
+            else{
+                xor_matrix[i][j] = 255;
+            }
+        }
+    }
+    finTache("XOR");
+    writeImage("images/output/xorImage.pgm", xor_matrix, min_row, min_col);
+    return xor_matrix;
+}
+
+int **addition(int **matrix_image, int row1, int col1, int **matrix_image2, int row2, int col2)
+{
+    int min_row=row1, min_col=col1;
+    if(min_row > row2){
+        min_row = row2;
+    }
+
+    if(min_col > col2){
+        min_col = col2;
+    }
+
+    int **result_matrix = allocateMatrix(min_row, min_col);
+
+    for(int i=0; i<min_row; i++){
+        for(int j=0; j<min_col; j++){
+            result_matrix[i][j] = matrix_image[i][j] + matrix_image2[i][j];
+            if(result_matrix[i][j] > 255){
+                result_matrix[i][j] = 255;
+            }
+        }
+    }
+    
+    finTache("Addition des images");
+    writeImage("images/output/Addition.pgm", result_matrix, min_row, min_col);
+    return result_matrix;
+}
+int **soustraction(int **matrix_image, int row1, int col1, int **matrix_image2, int row2, int col2)
+{
+    int min_row = row1, min_col = col1;
+    if (min_row > row2)
+    {
+        min_row = row2;
+    }
+
+    if (min_col > col2)
+    {
+        min_col = col2;
+    }
+
+    int **result_matrix = allocateMatrix(min_row, min_col);
+
+    for (int i = 0; i < min_row; i++)
+    {
+        for (int j = 0; j < min_col; j++)
+        {
+            result_matrix[i][j] = matrix_image[i][j] - matrix_image2[i][j];
+            if (result_matrix[i][j] < 0)
+            {
+                result_matrix[i][j] = 0;
+            }
+        }
+    }
+
+    finTache("Soustraction des images");
+    writeImage("images/output/Suppression.pgm", result_matrix, min_row, min_col);
+    return result_matrix;
+}
+int **multiplication(int **matrix_image, int row1, int col1, float ratio)
+{
+
+    if(ratio <= 0){
+        printf("Entrez un ratio > 0");
+        exit(EXIT_FAILURE);
+    }
+    
+    int **result_matrix = allocateMatrix(row1, col1);
+
+    for (int i = 0; i < row1; i++)
+    {
+        for (int j = 0; j < col1; j++)
+        {
+            result_matrix[i][j] = ratio*matrix_image[i][j];
+            if (result_matrix[i][j] > 255)
+            {
+                result_matrix[i][j] = 255;
+            }
+        }
+    }
+
+    finTache("Multiplication des images");
+    writeImage("images/output/Multiplication.pgm", result_matrix, row1, col1);
+    return result_matrix;
 }

@@ -11,4 +11,6 @@ int **allocateMatrix(int rows, int columns);
 int **readImage(char filename[], int *rows, int *columns);
 void writeImage(char filename[], int **matrix_image, int rows, int columns);
 
+void finTache(char tache_name[]);
+
 #endif 

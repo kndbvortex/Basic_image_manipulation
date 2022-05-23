@@ -17,9 +17,13 @@ int main(int argc, char *argv[])
     {
         printf("%d....\n", argc);
     }
-    int rows = 0, columns = 0, row2=0, col2=0;
-    int **matrix_image = readImage("images/input/tour.pgm", &rows, &columns);
-    int **bin_image = readImage("images/input/petitcoinET.pgm", &row2, &col2);
+    int rows = 0, columns = 0, row2 = 0, col2 = 0, row3 = 0, col3 = 0;
+    // int **matrix_image = readImage("images/input/tour.pgm", &rows, &columns);
+    // int **bin_image = readImage("images/input/imagebin.pgm", &rows, &columns);
+    // int **bin_image2 = readImage("images/input/imagebin2.pgm", &row2, &col2);
+    int **matrix_image = readImage("images/input/arithmetique.pgm", &rows, &columns);
+    int **matrix_image2 = readImage("images/input/arithmetique2.pgm", &row2, &col2);
+    int **matrix_image3 = readImage("images/input/terre.pgm", &row3, &col3);
     // hist_value = hist(matrix_image, rows, columns);
     // printArray(hist_value, 255);
     // printf("min: %d, max: %d", min(matrix_image, rows, columns), max(matrix_image, rows, columns));
@@ -34,6 +38,13 @@ int main(int argc, char *argv[])
     // double coef_dir[] = {0.1, 0.86};
     // transformation_lineaire_par_morceau(matrix_image, rows, columns, coef_dir, cord_ord, seuils, 2);
 
-    ETLogique(matrix_image, rows, columns, bin_image, row2, col2);
+    //ETLogique(matrix_image, rows, columns, bin_image, row2, col2);
+    // XORLogique(bin_image, rows, columns, bin_image2, row2, col2);
+    // addition(matrix_image, rows, columns, matrix_image2, row2, col2);
+    // soustraction(matrix_image2, row2, col2, matrix_image, rows, columns);
+    int ** im1 = multiplication(matrix_image, rows, columns, 0.5);
+    int **im2 = multiplication(matrix_image2, rows, columns, 0.5);
+    addition(im1, rows, columns, im2, row2, col2);
+
     return 0;
 }
