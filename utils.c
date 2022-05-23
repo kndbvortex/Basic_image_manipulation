@@ -37,7 +37,7 @@ int **allocateMatrix(int rows, int columns)
         if (matrix[i] == NULL)
         {
             printf("Erreur lors de l'allocation de l'espace sous tableau matrice_image!");
-            exit(1);
+            exit(EXIT_FAILURE);
         }
     }
     return matrix;
@@ -51,8 +51,8 @@ int **readImage(char filename[], int *rows, int *columns)
 
     if (fptr == NULL)
     {
-        printf("Erreur lors de l'ouverture du fichier!");
-        exit(1);
+        printf("Erreur lors de l'ouverture du fichier {%s} n'existe pas!", filename);
+        exit(EXIT_FAILURE);
     }
     else
     {
@@ -61,7 +61,6 @@ int **readImage(char filename[], int *rows, int *columns)
         fscanf(fptr, "%s\n", text);
         fscanf(fptr, "%[^\n]", text);
         fscanf(fptr, "%d %d\n", columns, rows);
-        printf("%d %d\n", *columns, *rows);
         fscanf(fptr, "%d\n", &val_max_color);
 
         int **matrix_image = allocateMatrix(*rows, *columns);
@@ -76,13 +75,14 @@ int **readImage(char filename[], int *rows, int *columns)
                 }
                 else
                 {
-                    exit(1);
+                    exit(EXIT_FAILURE);
                 }
             }
         }
         // printMatrix(matrix_image, *rows, *columns);
 
         fclose(fptr);
+        printf("L'image {%s} a été lu avec succès, de dimension %d X %d\n",filename, *rows, *columns);
         return matrix_image;
     }
 }
@@ -108,6 +108,6 @@ void writeImage(char filename[], int **matrix_image, int rows, int columns)
             }
         }
     }
-    printf("Sauvegarde effectué avec succès\n");
+    printf("Sauvegarde effectuée avec succès sous {%s}\n", filename);
     fclose(fptr);
 }

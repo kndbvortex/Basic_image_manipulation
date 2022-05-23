@@ -85,7 +85,7 @@ int **seuillage(int **matrix_image, int rows, int columns, int seuil)
 
 int min(int **matrix_image, int rows, int columns)
 {
-    int val_min = 255;
+    float val_min = INFINITY;
     for (int i = 0; i < rows; i++)
     {
         for (int j = 0; j < columns; j++)
@@ -96,7 +96,7 @@ int min(int **matrix_image, int rows, int columns)
             }
         }
     }
-    return val_min;
+    return (int)val_min;
 }
 
 int max(int **matrix_image, int rows, int columns)
@@ -212,41 +212,41 @@ int **egalisationHistogram(int **matrix_image, int rows, int columns)
 // S = m.(r-a) + v, a <= r < b
 // S = n.(r-b) + w, b <= r < L-1
 // where l, m, n are slopes
-int **transformation_lineaire_par_morceau(int **matrix_image, int rows, int columns, double coef_dir[], int cord_ord[], int seuils[], int n)
-{
-    int **matrix_image_trans = allocateMatrix(rows, columns);
-    for (int i = 0; i < rows; i++)
-    {
-        for (int j = 0; j < columns; j++)
-        {
-            if (matrix_image[i][j] >= 0 && matrix_image[i][j] < seuils[0]){
-                matrix_image_trans[i][j] = coef_dir[0] * matrix_image[i][j];
-            }
-            else{
-                int last = 0;
-                int k=1;
-                while(last==0 || k < n)
-                {
-                    if (matrix_image[i][j] < seuils[k] && matrix_image[i][j] > seuils[k - 1])
-                    {
-                        matrix_image_trans[i][j] = coef_dir[k] * (matrix_image[i][j] - seuils[k - 1]) + cord_ord[k];
-                        last = 1;
-                    }
-                    k++;
-                }
-                if(last == 1){
-                    if (matrix_image[i][j] >= seuils[k-1] && matrix_image[i][j] < 255)
-                    {
-                        matrix_image_trans[i][j] = coef_dir[k] * (matrix_image[i][j] - seuils[k - 1]) + cord_ord[k];
-                    }
-                }
-            }
+// int **transformation_lineaire_par_morceau(int **matrix_image, int rows, int columns, double coef_dir[], int cord_ord[], int seuils[], int n)
+// {
+//     int **matrix_image_trans = allocateMatrix(rows, columns);
+//     for (int i = 0; i < rows; i++)
+//     {
+//         for (int j = 0; j < columns; j++)
+//         {
+//             if (matrix_image[i][j] >= 0 && matrix_image[i][j] < seuils[0]){
+//                 matrix_image_trans[i][j] = coef_dir[0] * matrix_image[i][j];
+//             }
+//             else{
+//                 int last = 0;
+//                 int k=1;
+//                 while(last==0 || k < n)
+//                 {
+//                     if (matrix_image[i][j] < seuils[k] && matrix_image[i][j] > seuils[k - 1])
+//                     {
+//                         matrix_image_trans[i][j] = coef_dir[k] * (matrix_image[i][j] - seuils[k - 1]) + cord_ord[k];
+//                         last = 1;
+//                     }
+//                     k++;
+//                 }
+//                 if(last == 1){
+//                     if (matrix_image[i][j] >= seuils[k-1] && matrix_image[i][j] < 255)
+//                     {
+//                         matrix_image_trans[i][j] = coef_dir[k] * (matrix_image[i][j] - seuils[k - 1]) + cord_ord[k];
+//                     }
+//                 }
+//             }
                 
-        }
-    }
-    writeImage("images/morceau.pgm", matrix_image_trans, rows, columns);
-    return matrix_image_trans;
-}
+//         }
+//     }
+//     writeImage("images/morceau.pgm", matrix_image_trans, rows, columns);
+//     return matrix_image_trans;
+// }
 
 // Incompréhension ?????
 int **transformation_par_log(int **matrix_image, int rows, int columns)
@@ -263,4 +263,72 @@ int **transformation_par_log(int **matrix_image, int rows, int columns)
     }
     writeImage("images/log.pgm", matrix_image_trans, rows, columns);
     return matrix_image_trans;
+}
+
+int **rogner(int **matrix_image, int rows, int columns, int new_row, int new_columns)
+{
+    if(new_columns<=0 || new_row<=0)
+    {
+        printf("Mauvaise dimension de rognage\n !!!");
+        exit(EXIT_FAILURE);
+    }
+    if(rows <= new_row && columns <= new_columns)
+    {
+        return matrix_image;
+    }
+    int **result_matrix = allocateMatrix(new_row, new_columns);
+    for(int i=0; i<new_row; i++){
+        for(int j=0; j<new_columns; j++){
+            result_matrix[i][j] = matrix_image[i][j];
+        }
+    }
+    return result_matrix;
+}
+
+int **OULogique(int **matrix_image, int row1, int col1, int **bin_matrix, int row2, int col2){
+    bin_matrix = seuillage(bin_matrix, row2, col2, 127);
+    int min_row=row1, min_col=col1;
+    if(min_row > row2)
+        min_row = row2;
+    if(min_col > col2)
+        min_col = col2;
+
+    int **ou_matrix = allocateMatrix(min_row, min_col);
+    for(int i=0; i<min_row; i++){
+        for(int j=0; j<min_col; j++){
+            if (bin_matrix[i][j] == 255)
+                ou_matrix[i][j] = 255;
+            else
+                ou_matrix[i][j] = matrix_image[i][j];
+        }   
+    }
+    
+    writeImage("images/output/testOU.pgm", ou_matrix, min_row, min_col);
+
+    return ou_matrix;
+}
+int **ETLogique(int **matrix_image, int row1, int col1, int **bin_matrix, int row2, int col2)
+{
+    bin_matrix = seuillage(bin_matrix, row2, col2, 127);
+    int min_row = row1, min_col = col1;
+    if (min_row > row2)
+        min_row = row2;
+    if (min_col > col2)
+        min_col = col2;
+
+    int **et_matrix = allocateMatrix(min_row, min_col);
+    for (int i = 0; i < min_row; i++)
+    {
+        for (int j = 0; j < min_col; j++)
+        {
+            if(bin_matrix[i][j] == 0)
+                et_matrix[i][j] = 0;
+            else
+                et_matrix[i][j] = matrix_image[i][j];
+        }
+    }
+
+    writeImage("images/output/testET.pgm", et_matrix, min_row, min_col);
+
+    return et_matrix;
 }
