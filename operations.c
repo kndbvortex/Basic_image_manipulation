@@ -447,3 +447,101 @@ int **multiplication(int **matrix_image, int row1, int col1, float ratio)
     writeImage("images/output/Multiplication.pgm", result_matrix, row1, col1);
     return result_matrix;
 }
+
+// Zoom ou dézoomer une image
+void interpolationSimple(int **matrix_image, int row, int col, int new_row, int new_col)
+{
+    if(new_row <= 0 || new_col <=0){
+        printf("Les nouvelles dimensions sont >0");
+        exit(EXIT_FAILURE);
+    }
+    int **result = allocateMatrix(new_row, new_col);
+    for(int i=0; i<new_row; i++)
+        for(int j=0; j<new_col; j++)
+            result[i][j] = -1;
+    for (int i = 0; i < row; i++){
+        for (int j = 0; j < col; j++){
+            result[(int)(i * ((float)new_row / row))][(int)(j*(float)new_col / col)] = matrix_image[i][j];
+        }
+    }
+
+    for (int i = 0; i < new_row; i++)
+    {
+        for (int j = 0; j < new_col; j++)
+        {
+            if(result[i][j] == -1)
+                result[i][j] = matrix_image[(int)(i / ((float)new_row / row))][(int)(j / ((float)new_col / col))];
+        }
+    }
+    finTache("Interpolation Simple");
+    writeImage("images/output/interpolation.pgm", result, new_row, new_col);
+}
+
+void interpolationBilineaire(int **matrix_image, int row, int col, int new_row, int new_col){
+    if (new_row <= 0 || new_col <= 0)
+    {
+        printf("Les nouvelles dimensions sont >0");
+        exit(EXIT_FAILURE);
+    }
+    int **result = allocateMatrix(new_row, new_col);
+    for (int i = 0; i < new_row; i++)
+        for (int j = 0; j < new_col; j++)
+            result[i][j] = -1;
+    for (int i = 0; i < row; i++)
+    {
+        for (int j = 0; j < col; j++)
+        {
+            result[(int)(i * ((float)new_row / row))][(int)(j * (float)new_col / col)] = matrix_image[i][j];
+        }
+    }
+
+    for (int i = 0; i < new_row; i++)
+    {
+        for (int j = 0; j < new_col; j++)
+        {
+            if (result[i][j] == -1){
+                int index_i = (int)(i / ((float)new_row / row));
+                int index_j = (int)(j / ((float)new_col / col));
+                printf("%d index_i %d index_j\n", index_i, index_j);
+                result[i][j] = matrix_image[index_i][index_j];
+                printf("Step 1\n");
+                if(index_i > 0){
+                    if(index_j < col-1){
+                        printf("Step 2 ");
+                        result[i][j] += matrix_image[index_i-1][index_j];
+                        result[i][j] += matrix_image[index_i - 1][index_j+1];
+                        result[i][j] += matrix_image[index_i][index_j+1];
+                    }
+                    else{
+                        printf("Step 3 ");
+                        result[i][j] += matrix_image[index_i - 1][index_j];
+                        result[i][j] += matrix_image[index_i - 1][index_j - 1];
+                        result[i][j] += matrix_image[index_i][index_j - 1];
+                    }
+                }
+                else{
+                    if (index_j < col - 1)
+                    {
+                        printf("Step 4 ");
+                        result[i][j] += matrix_image[index_i + 1][index_j];
+                        result[i][j] += matrix_image[index_i + 1][index_j + 1];
+                        result[i][j] += matrix_image[index_i][index_j + 1];
+                    }
+                    else
+                    {
+                        printf("Step 5 ");
+                        result[i][j] += matrix_image[index_i + 1][index_j];
+                        result[i][j] += matrix_image[index_i + 1][index_j - 1];
+                        result[i][j] += matrix_image[index_i][index_j - 1];
+                    }
+                }
+
+                result[i][j] /= 4;
+                
+            }
+                
+        }
+    }
+    finTache("Interpolation Bilinéaire");
+    writeImage("images/output/interpolationBiléaire.pgm", result, new_row, new_col);
+}

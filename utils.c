@@ -90,6 +90,7 @@ int **readImage(char filename[], int *rows, int *columns)
 /* Create image with a given matrix */
 void writeImage(char filename[], int **matrix_image, int rows, int columns)
 {
+    printf("Début de la création du fichier ...\n");
     FILE *fptr = fopen(filename, "w");
     if (fptr == NULL)
     {
@@ -98,6 +99,7 @@ void writeImage(char filename[], int **matrix_image, int rows, int columns)
     }
     else
     {
+
         fprintf(fptr, "P2\n#Created by Durande Kamga\n");
         fprintf(fptr, "%d %d\n255\n", columns, rows);
         for (int i = 0; i < rows; i++)
