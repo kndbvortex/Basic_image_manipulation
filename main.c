@@ -45,5 +45,8 @@ int main(int argc, char *argv[])
     //  int **im2 = multiplication(matrix_image2, rows, columns, 0.5);
     //  addition(im1, rows, columns, im2, row2, col2);
     interpolationSimple(matrix_image, rows, columns, 2*rows, 2*columns);
-    interpolationBilineaire(matrix_image, rows, columns, 2*rows, 2*columns);return 0;
+    interpolationBilineaire(matrix_image, rows, columns, 2*rows, 2*columns);
+    interpolationBicubique(matrix_image, rows, columns, 2 * rows, 2 * columns);
+
+    return 0;
 }
