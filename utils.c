@@ -23,6 +23,16 @@ void printMatrix(int **matrix, int rows, int columns)
     printf("]\n");
 }
 
+int *allocateVector(int size){
+    int *v = NULL;
+    v = malloc(size * sizeof(int));
+    if(v == NULL){
+        printf("Error Lors de l'allocation du vecteur");
+        exit(EXIT_FAILURE);
+    }
+    return v;
+}
+
 int **allocateMatrix(int rows, int columns)
 {
     int **matrix = (int **)malloc(rows * sizeof(int *));

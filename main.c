@@ -47,6 +47,7 @@ int main(int argc, char *argv[])
     interpolationSimple(matrix_image, rows, columns, 2*rows, 2*columns);
     interpolationBilineaire(matrix_image, rows, columns, 2*rows, 2*columns);
     interpolationBicubique(matrix_image, rows, columns, 2 * rows, 2 * columns);
+    rotation(matrix_image, rows, columns, 95);
 
     return 0;
 }

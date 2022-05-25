@@ -564,8 +564,10 @@ void interpolationBicubique(int **matrix_image, int row, int col, int new_row, i
                 {
                     if (index_j < col - 3)
                     {
-                        for(int k=index_i; k > index_i-4; k--){
-                            for(int l=index_j; l<index_j+4; l++){
+                        for (int k = index_i; k > index_i - 4; k--)
+                        {
+                            for (int l = index_j; l < index_j + 4; l++)
+                            {
                                 result[i][j] += matrix_image[k][l];
                             }
                         }
@@ -623,4 +625,68 @@ void interpolationBicubique(int **matrix_image, int row, int col, int new_row, i
     }
     finTache("Interpolation Bicubique");
     writeImage("images/output/interpolationBicubique.pgm", result, new_row, new_col);
+}
+
+void rotation(int **matrix_image, int row, int col, float angle)
+{
+    float rad_angle = 3.14 * angle / 180;
+    int diagonal = sqrt(row * row + col * col);
+    int **result = allocateMatrix(diagonal, diagonal);
+
+    for (int i = 0; i < diagonal; i++)
+        for (int j = 0; j < diagonal; j++)
+            result[i][j] = -1; 
+
+    int alpha = 0, beta=0;
+
+    if (cos(rad_angle) > 0 && sin(rad_angle) >0)
+        alpha = abs(cos(3.14 / 2 - rad_angle) * col);
+    else if (cos(rad_angle) > 0 && sin(rad_angle) < 0)
+        beta = abs(sin(rad_angle)*row);
+    else if (cos(rad_angle) < 0 && sin(rad_angle) > 0){
+        alpha = (1+sin(rad_angle)/2)*row;
+        beta = -1*cos(rad_angle)*col;
+    }
+    else{
+        beta = diagonal * abs(sin(3.14 / 4 + rad_angle));
+        alpha = abs(sin(rad_angle)) * col;
+    }
+
+
+    for (int i = 0; i < row; i++)
+    {
+        for (int j = 0; j < col; j++)
+        {
+            // Rotation du point (i, j) en (x, y) l'image de (i, j)
+            int x = (int)((i)*cos(rad_angle) + (j)*sin(rad_angle)) + beta;
+            int y = (int)(-1 * (i)*sin(rad_angle) + (j)*cos(rad_angle)) + alpha;
+            if (x >= 0 && y >= 0 && x<diagonal && y<diagonal)
+                result[x][y] = matrix_image[i][j];
+        }
+    }
+
+    for (int i = 0; i < diagonal; i++)
+    {
+        for (int j = 0; j < diagonal; j++)
+        {
+            if (result[i][j] == -1)
+            {
+                // Recherche de l'antécédent
+                int x = (int)((i-beta)*cos(rad_angle) - (j-alpha) * sin(rad_angle));
+                int y = (int)((i-beta)*sin(rad_angle) + (j-alpha) * cos(rad_angle));
+
+                if (x < 0 || y < 0)
+                    result[i][j] = 255;
+                else if (x >= row || y >= col)
+                    result[i][j] = 255;
+                else{
+                    result[i][j] = matrix_image[x][y];
+                }
+
+            }
+        }
+    }
+
+    finTache("Rotation de l'image");
+    writeImage("images/output/rotation.pgm", result, diagonal, diagonal);
 }
