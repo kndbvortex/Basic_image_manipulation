@@ -3,6 +3,7 @@
 #include <math.h>
 #include "headers/operations.h"
 #include "headers/utils.h"
+#include "headers/convolutions.h"
 
 int main(int argc, char *argv[])
 {
@@ -20,7 +21,7 @@ int main(int argc, char *argv[])
     // int **matrix_image = readImage("images/input/tour.pgm", &rows, &columns);
     // int **bin_image = readImage("images/input/imagebin.pgm", &rows, &columns);
     // int **bin_image2 = readImage("images/input/imagebin2.pgm", &row2, &col2);
-    int **matrix_image = readImage("images/input/rose.pgm", &rows, &columns);
+    int **matrix_image = readImage("images/input/boulanger.pgm", &rows, &columns);
     // int **matrix_image2 = readImage("images/input/arithmetique2.pgm", &row2, &col2);
     // int **matrix_image3 = readImage("images/input/terre.pgm", &row3, &col3);
     // hist_value = hist(matrix_image, rows, columns);
@@ -44,10 +45,14 @@ int main(int argc, char *argv[])
     //  int ** im1 = multiplication(matrix_image, rows, columns, 0.5);
     //  int **im2 = multiplication(matrix_image2, rows, columns, 0.5);
     //  addition(im1, rows, columns, im2, row2, col2);
-    interpolationSimple(matrix_image, rows, columns, 2*rows, 2*columns);
-    interpolationBilineaire(matrix_image, rows, columns, 2*rows, 2*columns);
-    interpolationBicubique(matrix_image, rows, columns, 2 * rows, 2 * columns);
-    rotation(matrix_image, rows, columns, 95);
-
+    // interpolationSimple(matrix_image, rows, columns, 2*rows, 2*columns);
+    // interpolationBilineaire(matrix_image, rows, columns, 2*rows, 2*columns);
+    // interpolationBicubique(matrix_image, rows, columns, 2 * rows, 2 * columns);
+    // rotation(matrix_image, rows, columns, 190);
+    // filtre_moyenneur(matrix_image, rows, columns, 2);
+    int row_filter = 0, col_filter = 0;
+    int** gauss = readFilter("filtres/gauss.txt", &row_filter, &col_filter);
+    printMatrix(gauss, row_filter, col_filter);
+    filtre_gaussien(matrix_image, rows, columns, gauss, row_filter, col_filter);
     return 0;
 }

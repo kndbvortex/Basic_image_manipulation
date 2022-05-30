@@ -5,9 +5,30 @@
 void printArray(int *array, int lenght)
 {
     printf("[");
-    for (int i = 0; i <= lenght; i++)
+    for (int i = 0; i < lenght; i++)
     {
         printf("%d, ", array[i]);
+    }
+    printf("]\n");
+}
+
+void printFloatArray(float *array, int lenght)
+{
+    printf("[");
+    for (int i = 0; i < lenght; i++)
+    {
+        printf("%f, ", array[i]);
+    }
+    printf("]\n");
+}
+
+void printFloatMatrix(float **matrix, int rows, int columns)
+{
+    printf("[\n");
+    for (int i = 0; i < rows; i++)
+    {
+        printf("  ");
+        printFloatArray(matrix[i], columns);
     }
     printf("]\n");
 }
@@ -44,6 +65,26 @@ int **allocateMatrix(int rows, int columns)
     for (int i = 0; i < rows; i++)
     {
         matrix[i] = (int *)malloc(columns * sizeof(int));
+        if (matrix[i] == NULL)
+        {
+            printf("Erreur lors de l'allocation de l'espace sous tableau matrice_image!");
+            exit(EXIT_FAILURE);
+        }
+    }
+    return matrix;
+}
+
+float **allocateFloatMatrix(int rows, int columns)
+{
+    float **matrix = (float **)malloc(rows * sizeof(float *));
+    if (matrix == NULL)
+    {
+        printf("Erreur lors de l'allocation de l'espace matrice_image!");
+        exit(1);
+    }
+    for (int i = 0; i < rows; i++)
+    {
+        matrix[i] = (float *)malloc(columns * sizeof(float));
         if (matrix[i] == NULL)
         {
             printf("Erreur lors de l'allocation de l'espace sous tableau matrice_image!");
@@ -126,4 +167,28 @@ void writeImage(char filename[], int **matrix_image, int rows, int columns)
 
 void finTache(char tache_name[]){
     printf("Fin de l'opération %s\n", tache_name);
+}
+
+int** readFilter(char filename[], int *row, int *col){
+    FILE *fptr;
+
+    fptr = fopen(filename, "r");
+
+    if (fptr == NULL)
+    {
+        printf("Erreur lors de l'ouverture du fichier {%s} n'existe pas!", filename);
+        exit(EXIT_FAILURE);
+    }
+    else
+    {
+        fscanf(fptr, "%d %d\n", col, row);
+        int **filtre = allocateMatrix(*row, *col);
+        for(int i=0; i< *row; i++){
+            for(int j=0; j<*col; j++){
+                fscanf(fptr, "%d ", &filtre[i][j]);
+            }
+            fscanf(fptr, "\n");
+        }
+        return filtre;   
+    }
 }

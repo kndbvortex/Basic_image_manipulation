@@ -644,8 +644,8 @@ void rotation(int **matrix_image, int row, int col, float angle)
     else if (cos(rad_angle) > 0 && sin(rad_angle) < 0)
         beta = abs(sin(rad_angle)*row);
     else if (cos(rad_angle) < 0 && sin(rad_angle) > 0){
-        alpha = (1+sin(rad_angle)/2)*row;
-        beta = -1*cos(rad_angle)*col;
+        alpha = (1.2)*row;
+        beta = sin(rad_angle)*col;
     }
     else{
         beta = diagonal * abs(sin(3.14 / 4 + rad_angle));
