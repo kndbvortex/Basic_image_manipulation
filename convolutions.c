@@ -256,9 +256,6 @@ void filtre_median(int **matrix_image, int row, int col, int row_filtre, int col
                 }
             }
             result[i][j] = array[(row_filtre * col_filtre - 1) / 2];
-            // printArray(array, row_filtre * col_filtre);
-            // printf("médiane: %d\n", result[i][j]);
-            // // exit(EXIT_FAILURE);
             indice = 0;
         }
     }

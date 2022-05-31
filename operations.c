@@ -197,7 +197,6 @@ int **egalisationHistogram(int **matrix_image, int rows, int columns)
     {
         fraction_pixel[i] += fraction_pixel[i - 1];
     }
-    // printArray(hist_val);
     for (int i = 0; i < rows; i++)
     {
         for (int j = 0; j < columns; j++)
@@ -571,9 +570,6 @@ void interpolationBicubique(int **matrix_image, int row, int col, int new_row, i
                                 result[i][j] += matrix_image[k][l];
                             }
                         }
-                        // result[i][j] += matrix_image[index_i - 1][index_j];
-                        // result[i][j] += matrix_image[index_i - 1][index_j + 1];
-                        // result[i][j] += matrix_image[index_i][index_j + 1];
                     }
                     else
                     {
@@ -584,9 +580,6 @@ void interpolationBicubique(int **matrix_image, int row, int col, int new_row, i
                                 result[i][j] += matrix_image[k][l];
                             }
                         }
-                        // result[i][j] += matrix_image[index_i - 1][index_j];
-                        // result[i][j] += matrix_image[index_i - 1][index_j - 1];
-                        // result[i][j] += matrix_image[index_i][index_j - 1];
                     }
                 }
                 else
@@ -600,9 +593,6 @@ void interpolationBicubique(int **matrix_image, int row, int col, int new_row, i
                                 result[i][j] += matrix_image[k][l];
                             }
                         }
-                        // result[i][j] += matrix_image[index_i + 1][index_j];
-                        // result[i][j] += matrix_image[index_i + 1][index_j + 1];
-                        // result[i][j] += matrix_image[index_i][index_j + 1];
                     }
                     else
                     {
@@ -613,9 +603,6 @@ void interpolationBicubique(int **matrix_image, int row, int col, int new_row, i
                                 result[i][j] += matrix_image[k][l];
                             }
                         }
-                        // result[i][j] += matrix_image[index_i + 1][index_j];
-                        // result[i][j] += matrix_image[index_i + 1][index_j - 1];
-                        // result[i][j] += matrix_image[index_i][index_j - 1];
                     }
                 }
 

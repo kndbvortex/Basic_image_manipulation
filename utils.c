@@ -130,7 +130,6 @@ int **readImage(char filename[], int *rows, int *columns)
                 }
             }
         }
-        // printMatrix(matrix_image, *rows, *columns);
 
         fclose(fptr);
         printf("L'image {%s} a été lu avec succès, de dimension %d X %d\n",filename, *rows, *columns);
