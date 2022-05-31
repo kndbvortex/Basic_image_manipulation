@@ -105,10 +105,10 @@ int is_gaussian(float **filter, int row, int col, int i, int j)
         return 0;
     }
 
-    int rayon = (row + 1) / 2;
+    int rayon = (row - 1) / 2;
     float val = filter[i][j];
 
-    if (i == rayon - 1 && j == rayon - 1)
+    if (i == rayon && j == rayon)
     {
         for (int k = -1; k <= 1; k++)
         {
@@ -122,55 +122,67 @@ int is_gaussian(float **filter, int row, int col, int i, int j)
     }
     else if (i < rayon)
     {
-        int indice_decal = 0;
         if (j != rayon)
         {
             if (j > rayon)
-                indice_decal = 1;
+            {
+                if (filter[i - 1][j] > val || filter[i][j + 1] > val || filter[i - 1][j + 1] > val)
+                    return 1;
+            }
             else
-                indice_decal = -1;
-            if (filter[i + indice_decal][j] > val || filter[i + indice_decal][j + indice_decal] > val || filter[i][j + indice_decal] > val)
-                return 1;
+            {
+                if (filter[i - 1][j] > val || filter[i - 1][j - 1] > val || filter[i - 1][j + 1] > val)
+                    return 1;
+            }
             return 0;
         }
         else
         {
-            if (j == rayon)
-            {
-                if (filter[i - 1][j - 1] > val || filter[i - 1][j] > val || filter[i - 1][j + 1] > val)
-                    return 1;
-                return 0;
-            }
+            if (filter[i - 1][j - 1] > val || filter[i - 1][j] > val || filter[i - 1][j + 1] > val)
+                return 1;
+            return 0;
+        }
+    }
 
+    else if (i == rayon)
+    {
+        if (j < rayon)
+        {
             if (filter[i - 1][j - 1] > val || filter[i][j - 1] > val || filter[i + 1][j - 1] > val)
                 return 1;
-            return 0;
-        }
-    }
-    else
-    {
-        int indice_decal = 0;
-        if (i != rayon - 1)
-        {
-            if (j < rayon)
-                indice_decal = -1;
-            else
-                indice_decal = 1;
-
-            if (filter[i][j + indice_decal] > val || filter[i + 1][j] > val || filter[i + indice_decal][j + indice_decal] > val)
-            {
-                return 1;
-            }
-
-            return 0;
         }
         else
         {
-            if (filter[i + 1][j + 1] > val || filter[i][j + 1] > val || filter[i - 1][j + 1] > val)
+            if (filter[i - 1][j + 1] > val || filter[i][j + 1] > val || filter[i + 1][j + 1] > val)
                 return 1;
-            return 0;
         }
+        return 0;
     }
+
+    else if (i > rayon)
+    {
+        if (j == rayon)
+        {
+            if (filter[i + 1][j] > val || filter[i + 1][j - 1] > val || filter[i + 1][j + 1] > val)
+                return 1;
+        }
+        else if (j < rayon)
+        {
+            if (filter[i + 1][j] > val || filter[i + 1][j - 1] > val || filter[i][j - 1] > val)
+            {
+                return 1;
+            }
+        }
+        else
+        {
+            if (filter[i + 1][j] > val || filter[i + 1][j + 1] > val || filter[i][j + 1] > val)
+            {
+                return 1;
+            }
+        }
+        return 0;
+    }
+    return 0;
 }
 
 void filtre_gaussien(int **matrix_image, int row, int col, int **filtre, int row_filtre, int col_filtre)
@@ -217,10 +229,9 @@ void filtre_median(int **matrix_image, int row, int col, int row_filtre, int col
     int *array = allocateVector(row_filtre * col_filtre);
     int **result = allocateMatrix(row, col);
     int rayon_row = (row_filtre - 1) / 2, rayon_col = (col_filtre - 1) / 2;
-    int indice = 0, tmp=0;
-    printMatrix(matrix_image, row, col);
-    for(int i=0; i<row; i++)
-        for(int j=0; j<col; j++)
+    int indice = 0, tmp = 0;
+    for (int i = 0; i < row; i++)
+        for (int j = 0; j < col; j++)
             result[i][j] = 0;
 
     for (int i = rayon_row; i < row - rayon_row; i++)
@@ -232,17 +243,19 @@ void filtre_median(int **matrix_image, int row, int col, int row_filtre, int col
                 for (int l = -1 * rayon_col; l <= rayon_col; l++)
                 {
                     array[indice] = matrix_image[i + k][j + l];
-                    for(int s=indice; s>0; s--){
-                        if(array[s-1] > array[s]){
-                         tmp = array[s-1];
-                         array[s-1] = array[s];
-                         array[s] = tmp;  
+                    for (int s = indice; s > 0; s--)
+                    {
+                        if (array[s - 1] > array[s])
+                        {
+                            tmp = array[s - 1];
+                            array[s - 1] = array[s];
+                            array[s] = tmp;
                         }
                     }
                     indice++;
                 }
             }
-            result[i][j] = array[(row_filtre * col_filtre-1)/2];
+            result[i][j] = array[(row_filtre * col_filtre - 1) / 2];
             // printArray(array, row_filtre * col_filtre);
             // printf("médiane: %d\n", result[i][j]);
             // // exit(EXIT_FAILURE);

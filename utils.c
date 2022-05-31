@@ -189,6 +189,7 @@ int** readFilter(char filename[], int *row, int *col){
             }
             fscanf(fptr, "\n");
         }
+        fclose(fptr);
         return filtre;   
     }
 }

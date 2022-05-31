@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
     // int **matrix_image = readImage("images/input/tour.pgm", &rows, &columns);
     // int **bin_image = readImage("images/input/imagebin.pgm", &rows, &columns);
     // int **bin_image2 = readImage("images/input/imagebin2.pgm", &row2, &col2);
-    int **matrix_image = readImage("images/input/plaquen.pgm", &rows, &columns);
+    int **matrix_image = readImage("images/input/maisonSelPoivre.pgm", &rows, &columns);
     // int **matrix_image2 = readImage("images/input/arithmetique2.pgm", &row2, &col2);
     // int **matrix_image3 = readImage("images/input/terre.pgm", &row3, &col3);
     // hist_value = hist(matrix_image, rows, columns);
