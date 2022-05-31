@@ -29,6 +29,9 @@ int **convolution(int **matrix_image, int row, int col, float **filtre, int row_
     float conv_value = 0;
     rotation_filtre(filtre, row_filtre, col_filtre);
     int **result = allocateMatrix(row, col);
+    for (int i = 0; i < row; i++)
+        for (int j = 0; j < col; j++)
+            result[i][j] = 0;
     int rayon_row = (row_filtre - 1) / 2, rayon_col = (col_filtre - 1) / 2;
 
     for (int i = rayon_row; i < row - rayon_row; i++)
@@ -105,7 +108,7 @@ int is_gaussian(float **filter, int row, int col, int i, int j)
     int rayon = (row + 1) / 2;
     float val = filter[i][j];
 
-    if (i == rayon -1 && j == rayon-1)
+    if (i == rayon - 1 && j == rayon - 1)
     {
         for (int k = -1; k <= 1; k++)
         {
@@ -132,9 +135,9 @@ int is_gaussian(float **filter, int row, int col, int i, int j)
         }
         else
         {
-            int indice = 0;
-            if(j == rayon){
-                if (filter[i - 1][j - 1] > val || filter[i-1][j] > val || filter[i - 1][j + 1] > val)
+            if (j == rayon)
+            {
+                if (filter[i - 1][j - 1] > val || filter[i - 1][j] > val || filter[i - 1][j + 1] > val)
                     return 1;
                 return 0;
             }
@@ -144,7 +147,8 @@ int is_gaussian(float **filter, int row, int col, int i, int j)
             return 0;
         }
     }
-    else{
+    else
+    {
         int indice_decal = 0;
         if (i != rayon - 1)
         {
@@ -152,11 +156,12 @@ int is_gaussian(float **filter, int row, int col, int i, int j)
                 indice_decal = -1;
             else
                 indice_decal = 1;
-            
-            if (filter[i][j+indice_decal] > val || filter[i+1][j] > val || filter[i+indice_decal][j + indice_decal] > val){
+
+            if (filter[i][j + indice_decal] > val || filter[i + 1][j] > val || filter[i + indice_decal][j + indice_decal] > val)
+            {
                 return 1;
             }
-                
+
             return 0;
         }
         else
@@ -165,11 +170,10 @@ int is_gaussian(float **filter, int row, int col, int i, int j)
                 return 1;
             return 0;
         }
-    }    
+    }
 }
 
-
-void filtre_gaussien(int **matrix_image, int row, int col, int** filtre, int row_filtre, int col_filtre)
+void filtre_gaussien(int **matrix_image, int row, int col, int **filtre, int row_filtre, int col_filtre)
 {
     if (row_filtre % 2 == 0 || col_filtre % 2 == 0 || row_filtre != col_filtre)
     {
@@ -178,14 +182,18 @@ void filtre_gaussien(int **matrix_image, int row, int col, int** filtre, int row
     }
     float **gauss = allocateFloatMatrix(row_filtre, col_filtre);
     int s = sumMatrix(filtre, row_filtre, col_filtre);
-    for (int i = 0; i < row_filtre; i++){
+    for (int i = 0; i < row_filtre; i++)
+    {
         for (int j = 0; j < col_filtre; j++)
             gauss[i][j] = (float)filtre[i][j] / s;
     }
 
-    for(int i=0; i<row_filtre; i++){
-        for(int j=0; j<col_filtre; j++){
-            if((is_gaussian(gauss, row_filtre, col_filtre, i, j)) != 0){
+    for (int i = 0; i < row_filtre; i++)
+    {
+        for (int j = 0; j < col_filtre; j++)
+        {
+            if ((is_gaussian(gauss, row_filtre, col_filtre, i, j)) != 0)
+            {
                 printf("Entrez une Gaussienne valide à l'indexe (%d, %d)!!\n", i, j);
                 printFloatMatrix(gauss, row_filtre, col_filtre);
                 exit(EXIT_FAILURE);
@@ -197,4 +205,50 @@ void filtre_gaussien(int **matrix_image, int row, int col, int** filtre, int row
     finTache("Filtre Gaussien");
     writeImage("images/output/filtreGaussien.pgm", result, row, col);
     free(result);
+}
+
+void filtre_median(int **matrix_image, int row, int col, int row_filtre, int col_filtre)
+{
+    if (row_filtre % 2 == 0 || col_filtre % 2 == 0 || row_filtre != col_filtre)
+    {
+        printf("Opération non implémentée pour les filtres de taille Pair");
+        exit(EXIT_FAILURE);
+    }
+    int *array = allocateVector(row_filtre * col_filtre);
+    int **result = allocateMatrix(row, col);
+    int rayon_row = (row_filtre - 1) / 2, rayon_col = (col_filtre - 1) / 2;
+    int indice = 0, tmp=0;
+    printMatrix(matrix_image, row, col);
+    for(int i=0; i<row; i++)
+        for(int j=0; j<col; j++)
+            result[i][j] = 0;
+
+    for (int i = rayon_row; i < row - rayon_row; i++)
+    {
+        for (int j = rayon_col; j <= col - rayon_col; j++)
+        {
+            for (int k = -1 * rayon_row; k <= rayon_row; k++)
+            {
+                for (int l = -1 * rayon_col; l <= rayon_col; l++)
+                {
+                    array[indice] = matrix_image[i + k][j + l];
+                    for(int s=indice; s>0; s--){
+                        if(array[s-1] > array[s]){
+                         tmp = array[s-1];
+                         array[s-1] = array[s];
+                         array[s] = tmp;  
+                        }
+                    }
+                    indice++;
+                }
+            }
+            result[i][j] = array[(row_filtre * col_filtre-1)/2];
+            // printArray(array, row_filtre * col_filtre);
+            // printf("médiane: %d\n", result[i][j]);
+            // // exit(EXIT_FAILURE);
+            indice = 0;
+        }
+    }
+    finTache("Filtre Médian");
+    writeImage("images/output/filtreMedian.pgm", result, row, col);
 }
