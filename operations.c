@@ -24,6 +24,7 @@ int *hist(int **matrix_image, int rows, int columns)
             hist[matrix_image[i][j]]++;
         }
     }
+
     return hist;
 }
 
@@ -126,6 +127,8 @@ int **contrast_linear_T(int **matrix_image, int rows, int columns)
             matrix_image_modified[i][j] = 255 * (matrix_image[i][j] - min_val) / (max_val - min_val);
         }
     }
+    finTache("Transformation linéaire");
+    writeImage("images/output/transformationLineaire.pgm", matrix_image_modified, rows, columns);
     return matrix_image_modified;
 }
 
@@ -157,6 +160,8 @@ int **contrast_linear_avec_saturation(int **matrix_image, int rows, int columns,
             }
         }
     }
+    finTache("Transformation linéaire avec saturation");
+    writeImage("images/output/transformationLineaireSaturation.pgm", matrix_image_modified, rows, columns);
     return matrix_image_modified;
 }
 
@@ -171,6 +176,8 @@ int **inverseImage(int **matrix_image, int rows, int columns)
             matrix_image_modified[i][j] = 255 - matrix_image[i][j];
         }
     }
+    finTache("Inverse de l'image");
+    writeImage("images/output/Inverse.pgm", matrix_image_modified, rows, columns);
     return matrix_image_modified;
 }
 
@@ -204,6 +211,8 @@ int **egalisationHistogram(int **matrix_image, int rows, int columns)
             matrix_egalise[i][j] = fraction_pixel[matrix_image[i][j]] * 255;
         }
     }
+    finTache("Egalisation d'histogramme");
+    writeImage("images/output/egalise.pgm", matrix_egalise, rows, columns);
     return matrix_egalise;
 }
 
@@ -622,23 +631,24 @@ void rotation(int **matrix_image, int row, int col, float angle)
 
     for (int i = 0; i < diagonal; i++)
         for (int j = 0; j < diagonal; j++)
-            result[i][j] = -1; 
+            result[i][j] = -1;
 
-    int alpha = 0, beta=0;
+    int alpha = 0, beta = 0;
 
-    if (cos(rad_angle) > 0 && sin(rad_angle) >0)
+    if (cos(rad_angle) > 0 && sin(rad_angle) > 0)
         alpha = abs(cos(3.14 / 2 - rad_angle) * col);
     else if (cos(rad_angle) > 0 && sin(rad_angle) < 0)
-        beta = abs(sin(rad_angle)*row);
-    else if (cos(rad_angle) < 0 && sin(rad_angle) > 0){
-        alpha = (1.2)*row;
-        beta = sin(rad_angle)*col;
+        beta = abs(sin(rad_angle) * row);
+    else if (cos(rad_angle) < 0 && sin(rad_angle) > 0)
+    {
+        alpha = (1.2) * row;
+        beta = sin(rad_angle) * col;
     }
-    else{
+    else
+    {
         beta = diagonal * abs(sin(3.14 / 4 + rad_angle));
         alpha = abs(sin(rad_angle)) * col;
     }
-
 
     for (int i = 0; i < row; i++)
     {
@@ -647,7 +657,7 @@ void rotation(int **matrix_image, int row, int col, float angle)
             // Rotation du point (i, j) en (x, y) l'image de (i, j)
             int x = (int)((i)*cos(rad_angle) + (j)*sin(rad_angle)) + beta;
             int y = (int)(-1 * (i)*sin(rad_angle) + (j)*cos(rad_angle)) + alpha;
-            if (x >= 0 && y >= 0 && x<diagonal && y<diagonal)
+            if (x >= 0 && y >= 0 && x < diagonal && y < diagonal)
                 result[x][y] = matrix_image[i][j];
         }
     }
@@ -659,17 +669,17 @@ void rotation(int **matrix_image, int row, int col, float angle)
             if (result[i][j] == -1)
             {
                 // Recherche de l'antécédent
-                int x = (int)((i-beta)*cos(rad_angle) - (j-alpha) * sin(rad_angle));
-                int y = (int)((i-beta)*sin(rad_angle) + (j-alpha) * cos(rad_angle));
+                int x = (int)((i - beta) * cos(rad_angle) - (j - alpha) * sin(rad_angle));
+                int y = (int)((i - beta) * sin(rad_angle) + (j - alpha) * cos(rad_angle));
 
                 if (x < 0 || y < 0)
-                    result[i][j] = 255;
+                    result[i][j] = 0;
                 else if (x >= row || y >= col)
-                    result[i][j] = 255;
-                else{
+                    result[i][j] = 0;
+                else
+                {
                     result[i][j] = matrix_image[x][y];
                 }
-
             }
         }
     }

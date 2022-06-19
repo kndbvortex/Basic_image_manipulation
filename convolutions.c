@@ -34,6 +34,14 @@ int **convolution(int **matrix_image, int row, int col, float **filtre, int row_
             result[i][j] = 0;
     int rayon_row = (row_filtre - 1) / 2, rayon_col = (col_filtre - 1) / 2;
 
+    float s = sumFloatMatrix(filtre, row_filtre, col_filtre);
+    if (s != 0)
+    {
+        for (int i = 0; i < row_filtre; i++)
+            for (int j = 0; j < col_filtre; j++)
+                filtre[i][j] /= s;
+    }
+
     for (int i = rayon_row; i < row - rayon_row; i++)
     {
         for (int j = rayon_col; j <= col - rayon_col; j++)
@@ -46,11 +54,15 @@ int **convolution(int **matrix_image, int row, int col, float **filtre, int row_
                     conv_value += filtre[rayon_row + k][rayon_col + l] * matrix_image[i + k][j + l];
                 }
             }
+            if (conv_value < 0)
+                conv_value *= -1;
+            if (conv_value > 255)
+                conv_value = 255;
+
             result[i][j] = conv_value;
         }
     }
     finTache("Convolution");
-    writeImage("images/output/convolution.pgm", result, row, col);
     return result;
 }
 
@@ -251,6 +263,9 @@ void filtre_median(int **matrix_image, int row, int col, int row_filtre, int col
                             array[s - 1] = array[s];
                             array[s] = tmp;
                         }
+
+                        else
+                            break;
                     }
                     indice++;
                 }

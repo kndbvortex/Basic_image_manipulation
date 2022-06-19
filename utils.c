@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "headers/utils.h"
+#include <string.h>
 
 void printArray(int *array, int lenght)
 {
@@ -160,12 +161,29 @@ void writeImage(char filename[], int **matrix_image, int rows, int columns)
             }
         }
     }
+    
     printf("Sauvegarde effectuée avec succès sous {%s}\n", filename);
     fclose(fptr);
+    char command[1000] = "eog ";
+    strcat(command, filename);
+    system(command);
 }
 
 void finTache(char tache_name[]){
     printf("Fin de l'opération %s\n", tache_name);
+}
+
+void writeHistogram(int hist[], int m){
+    int **result = allocateMatrix(m, 256);
+    for (int i = 0; i < m; i++)
+        for (int j = 0; j < 256; j++)
+            result[i][j] = 0;
+    for (int j = 0; j < 256; j++)
+    {
+        for (int i = m - hist[j]; i < m; i++)
+            result[i][j] = 255;
+    }
+    writeImage("images/output/histogram.pgm", result, m, 256);
 }
 
 int** readFilter(char filename[], int *row, int *col){
@@ -190,5 +208,34 @@ int** readFilter(char filename[], int *row, int *col){
         }
         fclose(fptr);
         return filtre;   
+    }
+}
+
+float **readFloatFilter(char filename[], int *row, int *col)
+{
+    FILE *fptr;
+
+    fptr = fopen(filename, "r");
+
+    if (fptr == NULL)
+    {
+        printf("Erreur lors de l'ouverture du fichier {%s} n'existe pas!", filename);
+        exit(EXIT_FAILURE);
+    }
+    else
+    {
+        fscanf(fptr, "%d %d\n", col, row);
+        float **filtre = allocateFloatMatrix(*row, *col);
+        for (int i = 0; i < *row; i++)
+        {
+            for (int j = 0; j < *col; j++)
+            {
+                fscanf(fptr, "%f ", &filtre[i][j]);
+            }
+            fscanf(fptr, "\n");
+        }
+        
+        fclose(fptr);
+        return filtre;
     }
 }

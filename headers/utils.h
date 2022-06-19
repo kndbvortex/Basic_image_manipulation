@@ -14,9 +14,10 @@ float **allocateFloatMatrix(int rows, int columns);
 
 int **readImage(char filename[], int *rows, int *columns);
 void writeImage(char filename[], int **matrix_image, int rows, int columns);
+void writeHistogram(int hist[], int m);
 
 void finTache(char tache_name[]);
 
 int **readFilter(char filename[], int *row, int *col);
-
+float **readFloatFilter(char filename[], int *row, int *col);
 #endif
