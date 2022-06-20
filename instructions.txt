@@ -1,0 +1,20 @@
+hist image
+luminance image
+transLineaire image
+transAvecSat image smin smax //2 et 50
+inverse image
+egalisation image
+ou image image_bin
+et image image_bin
+xor image image_bin
+addition image1 image2
+soustraction image1 image2
+multiplication image nombre
+interploationSimple image rapport
+interpolationBilineaire image rapport
+interpolationBicubique image rapport
+rotation image angle
+convolution image
+filtreMoyenneur image rayon
+filtreGaussien image
+filtreMedian image taille
