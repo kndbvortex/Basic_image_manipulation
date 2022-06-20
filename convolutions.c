@@ -3,20 +3,6 @@
 #include "headers/convolutions.h"
 #include "headers/utils.h"
 
-// Rotation du filtre
-void rotation_filtre(float **filtre, int row, int col)
-{
-    float tmp = 0.0;
-    for (int i = 0; i < row; i++)
-    {
-        for (int j = 0; j < col; j++)
-        {
-            tmp = filtre[i][j];
-            filtre[i][j] = filtre[row - 1 - i][col - 1 - j];
-            filtre[row - 1 - i][col - 1 - j] = tmp;
-        }
-    }
-}
 
 // Convolution
 int **convolution(int **matrix_image, int row, int col, float **filtre, int row_filtre, int col_filtre)
@@ -27,7 +13,6 @@ int **convolution(int **matrix_image, int row, int col, float **filtre, int row_
         exit(EXIT_FAILURE);
     }
     float conv_value = 0;
-    rotation_filtre(filtre, row_filtre, col_filtre);
     int **result = allocateMatrix(row, col);
     for (int i = 0; i < row; i++)
         for (int j = 0; j < col; j++)
@@ -285,8 +270,6 @@ void contour_sobel(int **matrix, int row, int col, int seuil)
     float **s_y = readFloatFilter("filtres/sobel_y.txt", &row_f, &col_f);
     int **Gx = convolution(matrix, row, col, s_x, row_f, col_f);
     int **Gy = convolution(matrix, row, col, s_y, row_f, col_f);
-    writeImage("images/output/sobelx.pgm", Gx, row, col);
-    writeImage("images/output/sobely.pgm", Gy, row, col);
     int **sobel = allocateMatrix(row, col);
     for (int i = 0; i < row; i++)
     {
@@ -306,6 +289,58 @@ void contour_sobel(int **matrix, int row, int col, int seuil)
         }
     }
     writeImage("images/output/sobel.pgm", sobel, row, col);
+    free(sobel);
+    free(Gx);
+    free(Gy);
 }
-void contour_prewitt(int **matrix, int row, int col);
-void contour_laplacien(int **matrix, int row, int col);
+void contour_prewitt(int **matrix, int row, int col, int seuil){
+    int col_f = 0, row_f = 0;
+    float **p_x = readFloatFilter("filtres/prewitt_x.txt", &row_f, &col_f);
+    float **p_y = readFloatFilter("filtres/prewitt_y.txt", &row_f, &col_f);
+    int **Gx = convolution(matrix, row, col, p_x, row_f, col_f);
+    int **Gy = convolution(matrix, row, col, p_y, row_f, col_f);
+    int **prewitt = allocateMatrix(row, col);
+    for (int i = 0; i < row; i++)
+    {
+        for (int j = 0; j < col; j++)
+        {
+            prewitt[i][j] = Gx[i][j] + Gy[i][j];
+            if (prewitt[i][j] > 255)
+            {
+                prewitt[i][j] = 255;
+            }
+            if (seuil != -1)
+            {
+                if (prewitt[i][j] >= seuil)
+                    prewitt[i][j] = 255;
+                else
+                    prewitt[i][j] = 0;
+            }
+        }
+    }
+    writeImage("images/output/prewitt.pgm", prewitt, row, col);
+    free(prewitt);
+    free(Gx);
+    free(Gy);
+}
+void contour_laplacien(int **matrix, int row, int col, int seuil){
+    int col_f = 0, row_f = 0;
+    float **H = readFloatFilter("filtres/laplacien.txt", &row_f, &col_f);
+    int **laplacien = convolution(matrix, row, col, H, row_f, col_f);
+    for (int i = 0; i < row; i++)
+    {
+        for (int j = 0; j < col; j++)
+        {
+            if (seuil != -1)
+            {
+                if (laplacien[i][j] >= seuil)
+                    laplacien[i][j] = 255;
+                else
+                    laplacien[i][j] = 0;
+            }
+        }
+    }
+    writeImage("images/output/laplacien.pgm", laplacien, row, col);
+    free(laplacien);
+    free(H);
+}

@@ -161,10 +161,32 @@ int main(int argc, char *argv[])
             filtre_median(matrix_image, rows, columns, atoi(argv[3]), atoi(argv[3]));
             free(matrix_image);
         }
+        else if (strcmp(argv[1], "contourPrewit") == 0)
+        {
+            int **matrix_image = readImage(argv[2], &rows, &columns);
+            contour_prewitt(matrix_image, rows, columns, -1);
+            free(matrix_image);
+        }
+        else if (strcmp(argv[1], "contourSobel") == 0)
+        {
+            int **matrix_image = readImage(argv[2], &rows, &columns);
+            contour_sobel(matrix_image, rows, columns, -1);
+            free(matrix_image);
+        }
+        else if (strcmp(argv[1], "contourLaplace") == 0)
+        {
+            int **matrix_image = readImage(argv[2], &rows, &columns);
+            contour_laplacien(matrix_image, rows, columns, -1);
+            free(matrix_image);
+        }
     }
-    int rows = 0, columns = 0, row2 = 0, col2 = 0, row3 = 0, col3 = 0;
-    int **matrix_image = readImage("images/input/personne.pgm", &rows, &columns);
-    contour_sobel(matrix_image, rows, columns, -1);
+    
+    // int rows = 0, columns = 0, row2 = 0, col2 = 0, row3 = 0, col3 = 0;
+    // int **matrix_image = readImage("images/input/voiture.pgm", &rows, &columns);
+    //contour_sobel(matrix_image, rows, columns, -1);
+    // contour_prewitt(matrix_image, rows, columns, -1);
+    //contour_laplacien(matrix_image, rows, columns, -1);
+
     // int **bin_image = readImage("images/input/imagebin.pgm", &rows, &columns);
     // int **bin_image2 = readImage("images/input/imagebin2.pgm", &row2, &col2);
     // int **matrix_image = readImage("images/input/fillet.pgm", &rows, &columns);
