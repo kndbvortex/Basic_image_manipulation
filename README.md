@@ -1,15 +1,14 @@
 # Basic image manipulation
 
-Implementation in  C programming languange of simple process with images in computer vision
+Implementation in C programming languange of simple process with images in computer vision
 
 Après avoir executeé le makefile via la commande **make**, En fonction de l'action à exécuter, certains paramètres seront necessaire à la ligne de commande.<br/>
 **image et image_bin** sont les chemins vers des images .pgm.<br/>
 **rapport** est un nombre à virgule > 0.<br/>
 **rayon** est un nombre entier positif représentant le rayon du filtre<br/>
 
-
-
 Exemple d'exécution pour la transformation linéaire avec saturation(transAvecSat): <br />
+
 ```
 ./main transAvecSat images/input/port.pgm 2 100
 ```

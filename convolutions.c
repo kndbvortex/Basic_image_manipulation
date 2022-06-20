@@ -277,3 +277,35 @@ void filtre_median(int **matrix_image, int row, int col, int row_filtre, int col
     finTache("Filtre Médian");
     writeImage("images/output/filtreMedian.pgm", result, row, col);
 }
+
+void contour_sobel(int **matrix, int row, int col, int seuil)
+{
+    int col_f = 0, row_f = 0;
+    float **s_x = readFloatFilter("filtres/sobel_x.txt", &row_f, &col_f);
+    float **s_y = readFloatFilter("filtres/sobel_y.txt", &row_f, &col_f);
+    int **Gx = convolution(matrix, row, col, s_x, row_f, col_f);
+    int **Gy = convolution(matrix, row, col, s_y, row_f, col_f);
+    writeImage("images/output/sobelx.pgm", Gx, row, col);
+    writeImage("images/output/sobely.pgm", Gy, row, col);
+    int **sobel = allocateMatrix(row, col);
+    for (int i = 0; i < row; i++)
+    {
+        for (int j = 0; j < col; j++)
+        {
+            sobel[i][j] = Gx[i][j] + Gy[i][j];
+            if (sobel[i][j] > 255)
+            {
+                sobel[i][j] = 255;
+            }
+            if(seuil != -1){
+                if(sobel[i][j] >= seuil)
+                    sobel[i][j] = 255;
+                else
+                    sobel[i][j] = 0;
+            }
+        }
+    }
+    writeImage("images/output/sobel.pgm", sobel, row, col);
+}
+void contour_prewitt(int **matrix, int row, int col);
+void contour_laplacien(int **matrix, int row, int col);

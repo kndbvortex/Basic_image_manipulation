@@ -162,8 +162,9 @@ int main(int argc, char *argv[])
             free(matrix_image);
         }
     }
-    //int rows = 0, columns = 0, row2 = 0, col2 = 0, row3 = 0, col3 = 0;
-    // int **matrix_image = readImage("images/input/tour.pgm", &rows, &columns);
+    int rows = 0, columns = 0, row2 = 0, col2 = 0, row3 = 0, col3 = 0;
+    int **matrix_image = readImage("images/input/personne.pgm", &rows, &columns);
+    contour_sobel(matrix_image, rows, columns, -1);
     // int **bin_image = readImage("images/input/imagebin.pgm", &rows, &columns);
     // int **bin_image2 = readImage("images/input/imagebin2.pgm", &row2, &col2);
     // int **matrix_image = readImage("images/input/fillet.pgm", &rows, &columns);
