@@ -52,7 +52,25 @@ int main(int argc, char *argv[])
         else if (strcmp(argv[1], "egalisation") == 0)
         {
             int **matrix_image = readImage(argv[2], &rows, &columns);
-            free(egalisationHistogram(matrix_image, rows, columns));
+            int *histo = hist(matrix_image, rows, columns);
+            int m = 0;
+            for (int i = 0; i < 256; i++)
+            {
+                if (histo[i] > m)
+                    m = histo[i];
+            }
+            writeHistogram(histo, m);
+            int ** egal_matrix = egalisationHistogram(matrix_image, rows, columns);
+            histo = hist(egal_matrix, rows, columns);
+            m = 0;
+            for (int i = 0; i < 256; i++)
+            {
+                if (histo[i] > m)
+                    m = histo[i];
+            }
+            writeHistogram(histo, m);
+            free(histo);
+            free(egal_matrix);
             free(matrix_image);
         }
         else if (strcmp(argv[1], "ou") == 0)
@@ -164,26 +182,46 @@ int main(int argc, char *argv[])
         else if (strcmp(argv[1], "contourPrewit") == 0)
         {
             int **matrix_image = readImage(argv[2], &rows, &columns);
-            contour_prewitt(matrix_image, rows, columns, -1);
+            int seuil = -1;
+            if (argc >= 4)
+                seuil = atoi(argv[3]);
+            contour_prewitt(matrix_image, rows, columns, seuil);
             free(matrix_image);
         }
         else if (strcmp(argv[1], "contourSobel") == 0)
         {
             int **matrix_image = readImage(argv[2], &rows, &columns);
-            contour_sobel(matrix_image, rows, columns, -1);
+            int seuil = -1;
+            if(argc >= 4)
+                seuil = atoi(argv[3]);
+            contour_sobel(matrix_image, rows, columns, seuil);
             free(matrix_image);
         }
         else if (strcmp(argv[1], "contourLaplace") == 0)
         {
             int **matrix_image = readImage(argv[2], &rows, &columns);
-            contour_laplacien(matrix_image, rows, columns, -1);
+            int seuil = -1;
+            if (argc >= 4)
+                seuil = atoi(argv[3]);
+            contour_laplacien(matrix_image, rows, columns, seuil);
+            free(matrix_image);
+        }
+        else if (strcmp(argv[1], "hough") == 0)
+        {
+            int **matrix_image = readImage(argv[2], &rows, &columns);
+            int seuil = -1, seuil_h=-1;
+            if (argc >= 4)
+                seuil = atoi(argv[3]);
+            if (argc >= 5)
+                seuil = atoi(argv[4]);
+            transformee_hough(matrix_image, rows, columns, seuil, seuil_h);
             free(matrix_image);
         }
     }
     
     // int rows = 0, columns = 0, row2 = 0, col2 = 0, row3 = 0, col3 = 0;
-    // int **matrix_image = readImage("images/input/voiture.pgm", &rows, &columns);
-    //contour_sobel(matrix_image, rows, columns, -1);
+    // int **matrix_image = readImage("images/input/personne.pgm", &rows, &columns);
+    // transformee_hough(matrix_image, rows, columns, -1, 120);
     // contour_prewitt(matrix_image, rows, columns, -1);
     //contour_laplacien(matrix_image, rows, columns, -1);
 

@@ -35,7 +35,8 @@ Exemple d'exécution pour la transformation linéaire avec saturation(transAvecS
 <li>filtreMoyenneur image rayon</li>
 <li>filtreGaussien image</li>
 <li>filtreMedian image taill</li>
-<li>contourPrewit image</li>
-<li>contourSobel image</li>
-<li>contourLaplace image</li>
+<li>contourPrewit image [seuil]</li>
+<li>contourSobel image [seuil]</li>
+<li>contourLaplace image [seuil]</li>
+<li>hough image [seuil] [seuil_vote]</li>
 </ul>

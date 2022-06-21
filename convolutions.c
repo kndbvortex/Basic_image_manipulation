@@ -1,8 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <math.h>
 #include "headers/convolutions.h"
 #include "headers/utils.h"
-
 
 // Convolution
 int **convolution(int **matrix_image, int row, int col, float **filtre, int row_filtre, int col_filtre)
@@ -263,7 +263,7 @@ void filtre_median(int **matrix_image, int row, int col, int row_filtre, int col
     writeImage("images/output/filtreMedian.pgm", result, row, col);
 }
 
-void contour_sobel(int **matrix, int row, int col, int seuil)
+int **contour_sobel(int **matrix, int row, int col, int seuil)
 {
     int col_f = 0, row_f = 0;
     float **s_x = readFloatFilter("filtres/sobel_x.txt", &row_f, &col_f);
@@ -280,20 +280,22 @@ void contour_sobel(int **matrix, int row, int col, int seuil)
             {
                 sobel[i][j] = 255;
             }
-            if(seuil != -1){
-                if(sobel[i][j] >= seuil)
+            if (seuil != -1)
+            {
+                if (sobel[i][j] >= seuil)
                     sobel[i][j] = 255;
                 else
                     sobel[i][j] = 0;
             }
         }
     }
-    writeImage("images/output/sobel.pgm", sobel, row, col);
-    free(sobel);
+    // writeImage("images/output/sobel.pgm", sobel, row, col);
     free(Gx);
     free(Gy);
+    return sobel;
 }
-void contour_prewitt(int **matrix, int row, int col, int seuil){
+void contour_prewitt(int **matrix, int row, int col, int seuil)
+{
     int col_f = 0, row_f = 0;
     float **p_x = readFloatFilter("filtres/prewitt_x.txt", &row_f, &col_f);
     float **p_y = readFloatFilter("filtres/prewitt_y.txt", &row_f, &col_f);
@@ -323,7 +325,8 @@ void contour_prewitt(int **matrix, int row, int col, int seuil){
     free(Gx);
     free(Gy);
 }
-void contour_laplacien(int **matrix, int row, int col, int seuil){
+void contour_laplacien(int **matrix, int row, int col, int seuil)
+{
     int col_f = 0, row_f = 0;
     float **H = readFloatFilter("filtres/laplacien.txt", &row_f, &col_f);
     int **laplacien = convolution(matrix, row, col, H, row_f, col_f);
@@ -343,4 +346,80 @@ void contour_laplacien(int **matrix, int row, int col, int seuil){
     writeImage("images/output/laplacien.pgm", laplacien, row, col);
     free(laplacien);
     free(H);
+}
+
+void transformee_hough(int **matrix, int row, int col, int seuil, int seuil_vote)
+{
+    int **contour_image = contour_sobel(matrix, row, col, seuil);
+    // Theta dans [0-180]
+    float cos_angle[181], sin_angle[181];
+    int val_max_rho = round(sqrt(row * row + col * col));
+    for (int i = 0; i < 181; i++)
+    {
+        cos_angle[i] = cos(i * 3.14 / 180);
+        sin_angle[i] = sin(i * 3.14 / 180);
+    }
+    int **vote = allocateMatrix(val_max_rho, 181);
+    int **vote_a = allocateMatrix(val_max_rho, 181);
+    int **result = allocateMatrix(row, col);
+
+    for (int i = 0; i < val_max_rho; i++)
+    {
+        for (int j = 0; j < 181; j++)
+            vote[i][j] = 0;
+    }
+    for (int i = 0; i < row; i++)
+    {
+        for (int j = 0; j < col; j++)
+        {
+            result[i][j] = 0;
+            if (contour_image[i][j] == 255)
+            {
+                for (int theta = 0; theta < 181; theta++)
+                {
+                    int rho = i * cos_angle[theta] + j * sin_angle[theta];
+                    if (rho >= 0)
+                    {
+                        vote[rho][theta]++;
+                        vote_a[rho][theta]++;
+                        if (vote_a[rho][theta] > 255)
+                            vote_a[rho][theta] = 255;
+                    }
+                }
+            }
+        }
+    }
+    if (seuil_vote != -1)
+    {
+        for (int i = 0; i < val_max_rho; i++)
+        {
+            for (int j = 0; j < 181; j++)
+            {
+                if (vote[i][j] < seuil_vote)
+                {
+                    vote[i][j] = 0;
+                    vote_a[i][j] = 0;
+                }
+            }
+        }
+    }
+
+    // int y=0;
+
+    // for (int i = 0; i < val_max_rho; i++)
+    // {
+    //     for (int j = 0; j < 181; j++)
+    //     {
+    //         if (vote[i][j] != 0)
+    //         {
+    //             for(int k=0; k<row; k++){
+    //                 y = (-1*cos_angle[j]*k + i)*sin_angle[j];
+    //                 if(y > 0 && y < col)
+    //                     result[k][y] = 255;
+    //             }
+    //         }
+    //     }
+    // }
+    writeImage("images/output/accumulation.pgm", vote_a, val_max_rho, 181);
+    // writeImage("images/output/contourHough.pgm", result, row, col);
 }
