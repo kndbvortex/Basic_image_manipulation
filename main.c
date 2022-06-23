@@ -124,6 +124,31 @@ int main(int argc, char *argv[])
             free(multiplication(matrix_image, rows, columns, atof(argv[3])));
             free(matrix_image);
         }
+        else if (strcmp(argv[1], "addMultiplication") == 0)
+        {
+            int col, row;
+            int **matrix_image = readImage(argv[2], &rows, &columns);
+            int **matrix_image2 = readImage(argv[4], &row, &col);
+            float c1 = atof(argv[3]), c2 = atof(argv[5]);
+            int **m = multiplication(matrix_image, rows, columns, c1);
+            int **n = multiplication(matrix_image2, row, col, c2);
+            free(addition(m, rows, columns, n, row, col));
+            free(matrix_image);
+            free(matrix_image2);
+        }
+
+        else if (strcmp(argv[1], "sousMultiplication") == 0)
+        {
+            int col, row;
+            int **matrix_image = readImage(argv[2], &rows, &columns);
+            int **matrix_image2 = readImage(argv[4], &row, &col);
+            float c1 = atof(argv[3]), c2 = atof(argv[5]);
+            int **m = multiplication(matrix_image, rows, columns, c1);
+            int **n = multiplication(matrix_image2, row, col, c2);
+            free(soustraction(m, rows, columns, n, row, col));
+            free(matrix_image);
+            free(matrix_image2);
+        }
         else if (strcmp(argv[1], "interploationSimple") == 0)
         {
             int **matrix_image = readImage(argv[2], &rows, &columns);

@@ -27,6 +27,8 @@ Exemple d'exécution pour la transformation linéaire avec saturation(transAvecS
 <li>addition image1 image2</li>
 <li>soustraction image1 image2</li>
 <li>multiplication image nombre</li>
+<li>addMultiplication image1 coef image2 coef2</li>
+<li>sousMultiplication image1 coef image2 coef2</li>
 <li>interploationSimple image rapport</li>
 <li>interpolationBilineaire image rapport</li>
 <li>interpolationBicubique image rapport</li>
