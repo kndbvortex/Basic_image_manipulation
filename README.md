@@ -15,7 +15,7 @@ Exemple d'exécution pour la transformation linéaire avec saturation(transAvecS
 
 <h2>Liste des arguments possibles </h2> 
 <ul>
-<li>hist image</li>
+<li>histogram image</li>
 <li>luminance image</li>
 <li>transLineaire image</li>
 <li>transAvecSat image smin smax //2 et 50</li>
@@ -38,5 +38,5 @@ Exemple d'exécution pour la transformation linéaire avec saturation(transAvecS
 <li>contourPrewit image [seuil]</li>
 <li>contourSobel image [seuil]</li>
 <li>contourLaplace image [seuil]</li>
-<li>hough image [seuil] [seuil_vote]</li>
+<li>hough image [seuil] [Nombre de point]</li>
 </ul>

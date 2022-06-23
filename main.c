@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
     if (argc > 1)
     {
         int rows = 0, columns = 0;
-        if (strcmp(argv[1], "hist") == 0)
+        if (strcmp(argv[1], "histogram") == 0)
         {
             int **matrix_image = readImage(argv[2], &rows, &columns);
             int *histogram = hist(matrix_image, rows, columns);
@@ -213,7 +213,7 @@ int main(int argc, char *argv[])
             if (argc >= 4)
                 seuil = atoi(argv[3]);
             if (argc >= 5)
-                seuil = atoi(argv[4]);
+                seuil_h = atoi(argv[4]);
             transformee_hough(matrix_image, rows, columns, seuil, seuil_h);
             free(matrix_image);
         }

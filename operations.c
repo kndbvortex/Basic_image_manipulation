@@ -471,7 +471,7 @@ int **ratioImage(int **matrix_image, int row, int col, int new_row, int new_col)
 {
     if (new_row <= 0 || new_col <= 0)
     {
-        printf("Les nouvelles dimensions sont >0");
+        printf("Les nouvelles dimensions ne sont pas >0");
         exit(EXIT_FAILURE);
     }
     int **result = allocateMatrix(new_row, new_col);
@@ -487,6 +487,7 @@ int **ratioImage(int **matrix_image, int row, int col, int new_row, int new_col)
     }
     return result;
 }
+
 void interpolationSimple(int **matrix_image, int row, int col, int new_row, int new_col)
 {
     int **result = ratioImage(matrix_image, row, col, new_row, new_col);
