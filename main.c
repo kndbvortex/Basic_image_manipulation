@@ -7,6 +7,17 @@
 #include "headers/convolutions.h"
 #include "headers/fourier.h"
 
+struct pixel_index
+{
+    int niveau_gris;
+    int nbre;
+};
+typedef struct pixel_index pixel_index;
+
+int cmpfunc(const pixel_index *a, const pixel_index *b)
+{
+    return (a->nbre - b->nbre);
+}
 int main(int argc, char *argv[])
 {
     if (argc > 1)
@@ -17,9 +28,10 @@ int main(int argc, char *argv[])
             int **matrix_image = readImage(argv[2], &rows, &columns);
             int *histogram = hist(matrix_image, rows, columns);
             int m = 0;
-            for(int i=0; i<256; i++){
-                if(histogram[i] > m)
-                    m=histogram[i];
+            for (int i = 0; i < 256; i++)
+            {
+                if (histogram[i] > m)
+                    m = histogram[i];
             }
             writeHistogram(histogram, m);
             free(matrix_image);
@@ -60,7 +72,7 @@ int main(int argc, char *argv[])
                     m = histo[i];
             }
             writeHistogram(histo, m);
-            int ** egal_matrix = egalisationHistogram(matrix_image, rows, columns);
+            int **egal_matrix = egalisationHistogram(matrix_image, rows, columns);
             histo = hist(egal_matrix, rows, columns);
             m = 0;
             for (int i = 0; i < 256; i++)
@@ -217,7 +229,7 @@ int main(int argc, char *argv[])
         {
             int **matrix_image = readImage(argv[2], &rows, &columns);
             int seuil = -1;
-            if(argc >= 4)
+            if (argc >= 4)
                 seuil = atoi(argv[3]);
             contour_sobel(matrix_image, rows, columns, seuil);
             free(matrix_image);
@@ -234,7 +246,7 @@ int main(int argc, char *argv[])
         else if (strcmp(argv[1], "hough") == 0)
         {
             int **matrix_image = readImage(argv[2], &rows, &columns);
-            int seuil = -1, seuil_h=-1;
+            int seuil = -1, seuil_h = -1;
             if (argc >= 4)
                 seuil = atoi(argv[3]);
             if (argc >= 5)
@@ -242,13 +254,52 @@ int main(int argc, char *argv[])
             transformee_hough(matrix_image, rows, columns, seuil, seuil_h);
             free(matrix_image);
         }
+        else if (strcmp(argv[1], "binarisation") == 0)
+        {
+            int **matrix_image = readImage(argv[2], &rows, &columns);
+            int seuil = 0;
+            if (argc == 4)
+            {
+                if (strcmp(argv[3], "moyenne") == 0)
+                {
+                    seuil = luminance(matrix_image, rows, columns);
+                }
+                else if (strcmp(argv[3], "mediane") == 0)
+                {
+                    int min_image = min(matrix_image, rows, columns);
+                    int max_image = max(matrix_image, rows, columns);
+                    int *h = hist(matrix_image, rows, columns);
+                    pixel_index *tab = malloc((max_image - min_image + 1) * sizeof(pixel_index));
+                    for (int i = min_image; i <= max_image; i++)
+                    {
+                        tab[i - min_image].nbre = h[i];
+                        tab[i - min_image].niveau_gris = i;
+                    }
+                    free(h);
+                    qsort(tab, max_image - min_image + 1, sizeof(int), cmpfunc);
+                    seuil = tab[(max_image - min_image + 1) / 2].niveau_gris;
+                    free(tab);
+                }
+                else if (strcmp(argv[3], "automatique") == 0)
+                {
+                    seuil = seuil_otsu(matrix_image, rows, columns);
+                }
+                
+            }
+            else if (argc == 5){
+                seuil = atoi(argv[4]);
+            }
+            printf("Seuil = %d\n", seuil);
+            writeImage("images/output/binarisation.pgm", seuillage(matrix_image, rows, columns, seuil), rows, columns);
+            free(matrix_image);
+        }
     }
-    
+
     // int rows = 0, columns = 0, row2 = 0, col2 = 0, row3 = 0, col3 = 0;
     // int **matrix_image = readImage("images/input/personne.pgm", &rows, &columns);
     // transformee_hough(matrix_image, rows, columns, -1, 120);
     // contour_prewitt(matrix_image, rows, columns, -1);
-    //contour_laplacien(matrix_image, rows, columns, -1);
+    // contour_laplacien(matrix_image, rows, columns, -1);
 
     // int **bin_image = readImage("images/input/imagebin.pgm", &rows, &columns);
     // int **bin_image2 = readImage("images/input/imagebin2.pgm", &row2, &col2);

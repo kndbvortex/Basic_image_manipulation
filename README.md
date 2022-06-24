@@ -41,4 +41,5 @@ Exemple d'exécution pour la transformation linéaire avec saturation(transAvecS
 <li>contourSobel image [seuil]</li>
 <li>contourLaplace image [seuil]</li>
 <li>hough image [seuil] [Nombre de point]</li>
+<li>binarisation image type [valeur]</li>
 </ul>

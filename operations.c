@@ -59,6 +59,47 @@ double luminance(int **matrix_image, int rows, int columns)
     return L;
 }
 
+int seuil_otsu(int **matrix_image, int rows, int columns)
+{
+    int min_pixel = 0;
+    float moy1, moy2, p1, p2, min = 0;
+    int *h = hist(matrix_image, rows, columns);
+    for (int T = 0; T < 256; T++)
+    {
+        moy1 = 0;
+        moy2 = 0;
+        p1 = 0;
+        p2 = 0;
+        // Calcul des moyennes
+        for (int i = 0; i <= T - 1; i++)
+            p1 += h[i];
+
+        for (int i = T; i <= 255; i++)
+            p2 += h[i];
+
+        p1 /= (rows * columns);
+        p2 /= (rows * columns);
+
+        for (int i = 0; i <= T - 1; i++)
+            moy1 += i * h[i];
+
+        for (int i = T; i <= 255; i++)
+            moy2 += i * h[i];
+
+        moy1 /= p1;
+        moy2 /= p2;
+        float var = p1 * p2 * (moy1 - moy2) * (moy1 - moy2);
+
+        if (var > min)
+        {
+            min = var;
+            min_pixel = T;
+        }
+    }
+    free(h);
+    return min_pixel;
+}
+
 int **seuillage(int **matrix_image, int rows, int columns, int seuil)
 {
     if ((seuil >= 256 || seuil < 0))

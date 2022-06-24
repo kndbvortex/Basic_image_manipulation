@@ -12,14 +12,15 @@ int max(int **matrix_image, int rows, int columns);
 double luminance(int **matrix_image, int rows, int columns);
 
 // Binariser une image
+int seuil_otsu(int **matrix_image, int rows, int columns);
 int **seuillage(int **matrix_image, int rows, int columns, int seuil);
+
 int **rogner(int **matrix_image, int rows, int columns, int new_row, int new_columns);
 
 // Opérations sur le contraste
 int **contrast_linear_T(int **matrix_image, int rows, int columns);
 int **contrast_linear_avec_saturation(int **matrix_image, int rows, int columns, int smin, int smax);
 int **transformation_lineaire_par_morceau(int **matrix_image, int rows, int columns, double coef_dir[], int cord_ord[], int seuils[], int n);
-
 
 // à definir
 int **contrast_non_linear();
