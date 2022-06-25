@@ -52,7 +52,7 @@ int **convolution(int **matrix_image, int row, int col, float **filtre, int row_
     return result;
 }
 
-void filtre_moyenneur(int **matrix_image, int row, int col, int rayon)
+int** filtre_moyenneur(int **matrix_image, int row, int col, int rayon)
 {
 
     int cote = 2 * rayon + 1;
@@ -69,6 +69,7 @@ void filtre_moyenneur(int **matrix_image, int row, int col, int rayon)
     int **result = convolution(matrix_image, row, col, filtre, cote, cote);
     finTache("Filtre moyenneur");
     writeImage("images/output/filtreMoyenneur.pgm", result, row, col);
+    return result;
 }
 
 int sumMatrix(int **matrix_image, int row, int col)

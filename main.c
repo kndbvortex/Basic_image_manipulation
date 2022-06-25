@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
         if (strcmp(argv[1], "histogram") == 0)
         {
             int **matrix_image = readImage(argv[2], &rows, &columns);
-            int *histogram = hist(matrix_image, rows, columns);
+            int *histogram = hist(matrix_image, rows, columns, 0, 0);
             int m = 0;
             for (int i = 0; i < 256; i++)
             {
@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
         else if (strcmp(argv[1], "egalisation") == 0)
         {
             int **matrix_image = readImage(argv[2], &rows, &columns);
-            int *histo = hist(matrix_image, rows, columns);
+            int *histo = hist(matrix_image, rows, columns, 0, 0);
             int m = 0;
             for (int i = 0; i < 256; i++)
             {
@@ -73,7 +73,7 @@ int main(int argc, char *argv[])
             }
             writeHistogram(histo, m);
             int **egal_matrix = egalisationHistogram(matrix_image, rows, columns);
-            histo = hist(egal_matrix, rows, columns);
+            histo = hist(egal_matrix, rows, columns, 0, 0);
             m = 0;
             for (int i = 0; i < 256; i++)
             {
@@ -268,7 +268,7 @@ int main(int argc, char *argv[])
                 {
                     int min_image = min(matrix_image, rows, columns);
                     int max_image = max(matrix_image, rows, columns);
-                    int *h = hist(matrix_image, rows, columns);
+                    int *h = hist(matrix_image, rows, columns, 0, 0);
                     pixel_index *tab = malloc((max_image - min_image + 1) * sizeof(pixel_index));
                     for (int i = min_image; i <= max_image; i++)
                     {
@@ -282,7 +282,7 @@ int main(int argc, char *argv[])
                 }
                 else if (strcmp(argv[3], "automatique") == 0)
                 {
-                    seuil = seuil_otsu(matrix_image, rows, columns);
+                    seuil = seuil_otsu(matrix_image, rows, columns, 0, 0);
                 }
                 
             }
@@ -293,10 +293,24 @@ int main(int argc, char *argv[])
             writeImage("images/output/binarisation.pgm", seuillage(matrix_image, rows, columns, seuil), rows, columns);
             free(matrix_image);
         }
+        else if (strcmp(argv[1], "seuillageAdaptatif") == 0)
+        {
+            int **matrix_image = readImage(argv[2], &rows, &columns);
+            seuillage_adaptatif(matrix_image, rows, columns, atoi(argv[3]), atoi(argv[4]), argv[5]);
+            free(matrix_image);
+        }
     }
-
+    
     // int rows = 0, columns = 0, row2 = 0, col2 = 0, row3 = 0, col3 = 0;
-    // int **matrix_image = readImage("images/input/personne.pgm", &rows, &columns);
+    // int **matrix_image = readImage("images/input/cheque.pgm", &rows, &columns);
+    // printf("%d\n", 207/52);
+    // seuillage_adaptatif(matrix_image, rows, columns, 12, 20);
+    // int **co = filtre_moyenneur(matrix_image, rows, columns, 3);
+    // int **s = soustraction(matrix_image, rows, columns, co, rows, columns);
+    // //writeImage("images/output/test.pgm", s, rows, columns);
+    // s=egalisationHistogram(s, rows, columns);
+    // s=inverseImage(s, rows, columns);
+
     // transformee_hough(matrix_image, rows, columns, -1, 120);
     // contour_prewitt(matrix_image, rows, columns, -1);
     // contour_laplacien(matrix_image, rows, columns, -1);

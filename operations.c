@@ -1,10 +1,11 @@
 #include <stdio.h>
 #include <math.h>
+#include <string.h>
 
 #include "headers/operations.h"
 #include "headers/utils.h"
 
-int *hist(int **matrix_image, int rows, int columns)
+int *hist(int **matrix_image, int rows, int columns, int start_x, int start_y)
 {
     int *hist = malloc(256 * sizeof(int));
 
@@ -16,10 +17,9 @@ int *hist(int **matrix_image, int rows, int columns)
     for (int i = 0; i < 256; i++)
         hist[i] = 0;
 
-    printf("%d\n", rows);
-    for (int i = 0; i < rows; i++)
+    for (int i = start_x; i < start_x + rows; i++)
     {
-        for (int j = 0; j < columns; j++)
+        for (int j = start_y; j < start_y + columns; j++)
         {
             hist[matrix_image[i][j]]++;
         }
@@ -30,7 +30,7 @@ int *hist(int **matrix_image, int rows, int columns)
 
 double *hist_normalise(int **matrix_image, int rows, int columns)
 {
-    int *hist_val = hist(matrix_image, rows, columns);
+    int *hist_val = hist(matrix_image, rows, columns, 0, 0);
     double *hist_norm = malloc(256 * sizeof(double));
 
     if (hist_norm == NULL)
@@ -59,11 +59,11 @@ double luminance(int **matrix_image, int rows, int columns)
     return L;
 }
 
-int seuil_otsu(int **matrix_image, int rows, int columns)
+int seuil_otsu(int **matrix_image, int rows, int columns, int start_x, int start_y)
 {
     int min_pixel = 0;
     float moy1, moy2, p1, p2, min = 0;
-    int *h = hist(matrix_image, rows, columns);
+    int *h = hist(matrix_image, rows, columns, start_x, start_y);
     for (int T = 0; T < 256; T++)
     {
         moy1 = 0;
@@ -98,6 +98,86 @@ int seuil_otsu(int **matrix_image, int rows, int columns)
     }
     free(h);
     return min_pixel;
+}
+
+float moyenne(int **matrix, int row, int col, int start_x, int start_y)
+{
+    float s = 0;
+    for (int i = start_x; i <= row + start_x; i++)
+        for (int j = start_y; j <= col + start_y; j++)
+            s += matrix[i][j];
+    return s / (row * col);
+}
+
+float variance(int **matrix, int row, int col, int start_x, int start_y, float moy)
+{
+    float s = 0;
+    for (int i = start_x; i < start_x + row; i++)
+        for (int j = start_y; j < start_y + col; j++)
+            s += (moy - matrix[i][j]) * (moy - matrix[i][j]);
+    return s / (row * col);
+}
+
+int **seuillage_adaptatif(int **matrix_image, int row, int col, int nbre_region_x, int nbre_region_y, char type[])
+{
+    double l = luminance(matrix_image, row, col);
+    printf("Luminance=%f\n", l);
+
+    float **moy_regions = allocateFloatMatrix(nbre_region_x, nbre_region_y);
+    float **var_regions = allocateFloatMatrix(nbre_region_x, nbre_region_y);
+    int **seuil_regions = allocateMatrix(nbre_region_x, nbre_region_y);
+
+    int **result = allocateMatrix(row, col);
+    int pas_x = row / nbre_region_x, pas_y = col / nbre_region_y;
+    printf("n_x=%d, n_y=%d\n", nbre_region_x, nbre_region_y);
+    printf("Start calculus pas_x=%d, pas_y=%d\n", pas_x, pas_y);
+    for (int i = 0; i < nbre_region_x; i++)
+    {
+        for (int j = 0; j < nbre_region_y; j++)
+        {
+            moy_regions[i][j] = moyenne(matrix_image, pas_x, pas_y, i * pas_x, j * pas_y);
+            var_regions[i][j] = variance(matrix_image, pas_x, pas_y, i * pas_x, j * pas_y, moy_regions[i][j]);
+            if (strcmp(type, "moy") == 0)
+                seuil_regions[i][j] = moy_regions[i][j];
+            else
+                seuil_regions[i][j] = seuil_otsu(matrix_image, pas_x, pas_y, i * pas_x, j * pas_y);
+            // printf("Region: %d %d\n", i * pas_x, j * pas_y);
+        }
+    }
+    printf("End calculus....\n");
+    printMatrix(seuil_regions, nbre_region_x, nbre_region_y);
+
+    printf("Variances:\n");
+    printFloatMatrix(var_regions, nbre_region_x, nbre_region_y);
+    printFloatMatrix(moy_regions, nbre_region_x, nbre_region_y);
+    for (int i = 0; i < row; i++)
+    {
+        for (int j = 0; j < col; j++)
+        {
+            // printf("start modif i=%d j=%d region_x=%d region_y=%d\n", i, j, i / pas_x, j / pas_y);
+            int indice_x = i / pas_x, indice_y = j / pas_y; 
+            if(indice_x >= nbre_region_x)
+                indice_x = nbre_region_x-1;
+            if (indice_y >= nbre_region_y)
+                indice_y = nbre_region_y - 1;
+            if (var_regions[indice_x][indice_y] > l)
+            {
+                if (matrix_image[i][j] > seuil_regions[indice_x][indice_y])
+                    result[i][j] = 255;
+                else
+                    result[i][j] = 0;
+                // printf("End modif if\n");
+            }
+            else
+            {
+                result[i][j] = 0;
+                // printf("End modif else\n");
+            }
+        }
+    }
+    printf("End\n");
+    writeImage("images/output/seuillages_adaptatif.pgm", result, row, col);
+    return result;
 }
 
 int **seuillage(int **matrix_image, int rows, int columns, int seuil)
@@ -228,7 +308,7 @@ int **inverseImage(int **matrix_image, int rows, int columns)
 // sa fréquence cumulé ramené à l'intervale [0, 255]
 int **egalisationHistogram(int **matrix_image, int rows, int columns)
 {
-    int *hist_val = hist(matrix_image, rows, columns);
+    int *hist_val = hist(matrix_image, rows, columns, 0, 0);
     double *fraction_pixel = malloc(256 * sizeof(double));
 
     if (fraction_pixel == NULL)

@@ -42,4 +42,5 @@ Exemple d'exécution pour la transformation linéaire avec saturation(transAvecS
 <li>contourLaplace image [seuil]</li>
 <li>hough image [seuil] [Nombre de point]</li>
 <li>binarisation image type [valeur]</li>
+<li>seuillageAdaptatif image nbre_carreau_ligne nbre_carreau_colonne // Pacman 3 2</li>
 </ul>

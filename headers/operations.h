@@ -5,15 +5,16 @@
 #include <stdlib.h>
 
 // éléments de base
-int *hist(int **matrix_image, int rows, int columns);
+int *hist(int **matrix_image, int rows, int columns, int start_x, int start_y);
 double *hist_normalise(int **matrix_image, int rows, int columns);
 int min(int **matrix_image, int rows, int columns);
 int max(int **matrix_image, int rows, int columns);
 double luminance(int **matrix_image, int rows, int columns);
 
 // Binariser une image
-int seuil_otsu(int **matrix_image, int rows, int columns);
+int seuil_otsu(int **matrix_image, int rows, int columns, int start_x, int start_y);
 int **seuillage(int **matrix_image, int rows, int columns, int seuil);
+int **seuillage_adaptatif(int **matrix_image, int row, int col, int nbre_region_x, int nbre_region_y, char type[]);
 
 int **rogner(int **matrix_image, int rows, int columns, int new_row, int new_columns);
 
