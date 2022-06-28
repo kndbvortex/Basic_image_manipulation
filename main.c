@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
     if (argc > 1)
     {
         int rows = 0, columns = 0;
-        if (strcmp(argv[1], "histogram") == 0)
+        if (strcmp(argv[1], "histogramme") == 0)
         {
             int **matrix_image = readImage(argv[2], &rows, &columns);
             int *histogram = hist(matrix_image, rows, columns, 0, 0);
@@ -299,10 +299,17 @@ int main(int argc, char *argv[])
             seuillage_adaptatif(matrix_image, rows, columns, atoi(argv[3]), atoi(argv[4]), argv[5]);
             free(matrix_image);
         }
+        else if (strcmp(argv[1], "k-means") == 0)
+        {
+            int **matrix_image = readImage(argv[2], &rows, &columns);
+            k_means(matrix_image, rows, columns, atoi(argv[3]));
+            free(matrix_image);
+        }
     }
     
     // int rows = 0, columns = 0, row2 = 0, col2 = 0, row3 = 0, col3 = 0;
-    // int **matrix_image = readImage("images/input/cheque.pgm", &rows, &columns);
+    // int **matrix_image = readImage("images/input/personne.pgm", &rows, &columns);
+    // k_means(matrix_image, rows, columns, 4);
     // printf("%d\n", 207/52);
     // seuillage_adaptatif(matrix_image, rows, columns, 12, 20);
     // int **co = filtre_moyenneur(matrix_image, rows, columns, 3);

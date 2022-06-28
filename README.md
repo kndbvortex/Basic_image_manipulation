@@ -15,7 +15,7 @@ Exemple d'exécution pour la transformation linéaire avec saturation(transAvecS
 
 <h2>Liste des arguments possibles </h2> 
 <ul>
-<li>histogram image</li>
+<li>histogramme image</li>
 <li>luminance image</li>
 <li>transLineaire image</li>
 <li>transAvecSat image smin smax //2 et 50</li>
@@ -43,4 +43,5 @@ Exemple d'exécution pour la transformation linéaire avec saturation(transAvecS
 <li>hough image [seuil] [Nombre de point]</li>
 <li>binarisation image type [valeur]</li>
 <li>seuillageAdaptatif image nbre_carreau_ligne nbre_carreau_colonne // Pacman 3 2</li>
+<li>k-means image nbreCluster</li>
 </ul>

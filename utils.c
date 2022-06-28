@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "headers/utils.h"
 #include <string.h>
+#include <math.h>
 
 void printArray(int *array, int lenght)
 {
@@ -45,10 +46,12 @@ void printMatrix(int **matrix, int rows, int columns)
     printf("]\n");
 }
 
-int *allocateVector(int size){
+int *allocateVector(int size)
+{
     int *v = NULL;
     v = malloc(size * sizeof(int));
-    if(v == NULL){
+    if (v == NULL)
+    {
         printf("Error Lors de l'allocation du vecteur");
         exit(EXIT_FAILURE);
     }
@@ -133,7 +136,7 @@ int **readImage(char filename[], int *rows, int *columns)
         }
 
         fclose(fptr);
-        printf("L'image {%s} a été lu avec succès, de dimension %d X %d\n",filename, *rows, *columns);
+        printf("L'image {%s} a été lu avec succès, de dimension %d X %d\n", filename, *rows, *columns);
         return matrix_image;
     }
 }
@@ -161,7 +164,7 @@ void writeImage(char filename[], int **matrix_image, int rows, int columns)
             }
         }
     }
-    
+
     printf("Sauvegarde effectuée avec succès sous {%s}\n", filename);
     fclose(fptr);
     char command[1000] = "eog ";
@@ -169,11 +172,13 @@ void writeImage(char filename[], int **matrix_image, int rows, int columns)
     system(command);
 }
 
-void finTache(char tache_name[]){
+void finTache(char tache_name[])
+{
     printf("Fin de l'opération %s\n", tache_name);
 }
 
-void writeHistogram(int hist[], int m){
+void writeHistogram(int hist[], int m)
+{
     int **result = allocateMatrix(m, 256);
     for (int i = 0; i < m; i++)
         for (int j = 0; j < 256; j++)
@@ -186,7 +191,8 @@ void writeHistogram(int hist[], int m){
     writeImage("images/output/histogram.pgm", result, m, 256);
 }
 
-int** readFilter(char filename[], int *row, int *col){
+int **readFilter(char filename[], int *row, int *col)
+{
     FILE *fptr;
 
     fptr = fopen(filename, "r");
@@ -200,14 +206,16 @@ int** readFilter(char filename[], int *row, int *col){
     {
         fscanf(fptr, "%d %d\n", col, row);
         int **filtre = allocateMatrix(*row, *col);
-        for(int i=0; i< *row; i++){
-            for(int j=0; j<*col; j++){
+        for (int i = 0; i < *row; i++)
+        {
+            for (int j = 0; j < *col; j++)
+            {
                 fscanf(fptr, "%d ", &filtre[i][j]);
             }
             fscanf(fptr, "\n");
         }
         fclose(fptr);
-        return filtre;   
+        return filtre;
     }
 }
 
@@ -234,8 +242,43 @@ float **readFloatFilter(char filename[], int *row, int *col)
             }
             fscanf(fptr, "\n");
         }
-        
+
         fclose(fptr);
         return filtre;
+    }
+}
+
+int min_vector(int *v, int taille)
+{
+    float val_min = INFINITY;
+    for (int i = 0; i < taille; i++)
+    {
+        if (val_min > v[i])
+        {
+            val_min = v[i];
+        }
+    }
+    return (int)val_min;
+}
+
+int indice_min_vector(int *v, int taille)
+{
+    float val_min = INFINITY, indice;
+    for (int i = 0; i < taille; i++)
+    {
+        if (val_min > v[i])
+        {
+            val_min = v[i];
+            indice = i;
+        }
+    }
+    return (int)indice;
+}
+
+void init_vector(int *v, int taille, int val)
+{
+    for (int i = 0; i < taille; i++)
+    {
+        v[i] = val;
     }
 }

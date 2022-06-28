@@ -1,6 +1,8 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <math.h>
 #include <string.h>
+#include <time.h>
 
 #include "headers/operations.h"
 #include "headers/utils.h"
@@ -155,9 +157,9 @@ int **seuillage_adaptatif(int **matrix_image, int row, int col, int nbre_region_
         for (int j = 0; j < col; j++)
         {
             // printf("start modif i=%d j=%d region_x=%d region_y=%d\n", i, j, i / pas_x, j / pas_y);
-            int indice_x = i / pas_x, indice_y = j / pas_y; 
-            if(indice_x >= nbre_region_x)
-                indice_x = nbre_region_x-1;
+            int indice_x = i / pas_x, indice_y = j / pas_y;
+            if (indice_x >= nbre_region_x)
+                indice_x = nbre_region_x - 1;
             if (indice_y >= nbre_region_y)
                 indice_y = nbre_region_y - 1;
             if (var_regions[indice_x][indice_y] > l)
@@ -808,4 +810,72 @@ void rotation(int **matrix_image, int row, int col, float angle)
 
     finTache("Rotation de l'image");
     writeImage("images/output/rotation.pgm", result, diagonal, diagonal);
+}
+
+int **k_means(int **matrix, int row, int col, int k)
+{
+    if (k <= 1)
+    {
+        printf("Veuillez entrer un nombre de cluster valide ( > 1)\n");
+    }
+    int *mean_cluster = allocateVector(k);
+    int *taille_cluster = allocateVector(k);
+    int *sum_cluster_element = allocateVector(k);
+    int *distance_point_cluster = allocateVector(k);
+
+    int min_image = min(matrix, row, col), max_image = max(matrix, row, col), a_changer = 1;
+    //Initialisation des clusters
+    for (int i = 0; i < k; i++)
+    {
+        mean_cluster[i] = (rand() % (max_image - min_image + 1)) + min_image;
+    }
+    // Matrice pour les clusters
+    int **clusters_point = allocateMatrix(row, col);
+
+    // K-means 200 tours
+    for (int t = 0; t <= 200; t++)
+    {
+        init_vector(taille_cluster, k, 0);
+        for (int i = 0; i < row; i++)
+        {
+            for (int j = 0; j < col; j++)
+            {
+                // Calcul de la distance chaque point à chaque centre
+                for (int l = 0; l < k; l++)
+                {
+                    distance_point_cluster[l] = mean_cluster[l] - matrix[i][j];
+                    if (distance_point_cluster[l] < 0)
+                        distance_point_cluster[l] *= -1;
+                }
+                int son_cluster = indice_min_vector(distance_point_cluster, k);
+                clusters_point[i][j] = son_cluster;
+                taille_cluster[son_cluster]++;
+            }
+        }
+        // Recalcul des centres
+        init_vector(sum_cluster_element, k, 0);
+        for(int i=0; i<row; i++){
+            for(int j=0; j<col; j++){
+                sum_cluster_element[clusters_point[i][j]] += matrix[i][j];
+            }
+        }
+        // Recalcule des centres
+        for(int i=0; i<k; i++){
+            mean_cluster[i] = sum_cluster_element[i];
+            if (taille_cluster[i] != 0){
+                mean_cluster[i] /= taille_cluster[i];
+            }
+        }
+    }
+
+    // Attribution d'un niveau de gris à chaque groupe
+    for(int i=0; i<row; i++){
+        for(int j=0; j<col; j++){
+            clusters_point[i][j] = 255 * clusters_point[i][j]/(k-1);
+        }
+    }
+    
+    finTache("K-Means");
+    writeImage("images/output/k-means.pgm", clusters_point, row, col);
+    return clusters_point;
 }
