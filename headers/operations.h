@@ -16,6 +16,7 @@ int seuil_otsu(int **matrix_image, int rows, int columns, int start_x, int start
 int **seuillage(int **matrix_image, int rows, int columns, int seuil);
 int **seuillage_adaptatif(int **matrix_image, int row, int col, int nbre_region_x, int nbre_region_y, char type[]);
 int **k_means(int **matrix, int row, int col, int k);
+int **division_fusion(int **matrix, int row, int col, int critere);
 
 int **rogner(int **matrix_image, int rows, int columns, int new_row, int new_columns);
 

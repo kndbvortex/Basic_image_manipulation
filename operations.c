@@ -817,14 +817,15 @@ int **k_means(int **matrix, int row, int col, int k)
     if (k <= 1)
     {
         printf("Veuillez entrer un nombre de cluster valide ( > 1)\n");
+        exit(EXIT_FAILURE);
     }
     int *mean_cluster = allocateVector(k);
     int *taille_cluster = allocateVector(k);
     int *sum_cluster_element = allocateVector(k);
     int *distance_point_cluster = allocateVector(k);
 
-    int min_image = min(matrix, row, col), max_image = max(matrix, row, col), a_changer = 1;
-    //Initialisation des clusters
+    int min_image = min(matrix, row, col), max_image = max(matrix, row, col);
+    // Initialisation des clusters
     for (int i = 0; i < k; i++)
     {
         mean_cluster[i] = (rand() % (max_image - min_image + 1)) + min_image;
@@ -854,28 +855,55 @@ int **k_means(int **matrix, int row, int col, int k)
         }
         // Recalcul des centres
         init_vector(sum_cluster_element, k, 0);
-        for(int i=0; i<row; i++){
-            for(int j=0; j<col; j++){
+        for (int i = 0; i < row; i++)
+        {
+            for (int j = 0; j < col; j++)
+            {
                 sum_cluster_element[clusters_point[i][j]] += matrix[i][j];
             }
         }
         // Recalcule des centres
-        for(int i=0; i<k; i++){
+        for (int i = 0; i < k; i++)
+        {
             mean_cluster[i] = sum_cluster_element[i];
-            if (taille_cluster[i] != 0){
+            if (taille_cluster[i] != 0)
+            {
                 mean_cluster[i] /= taille_cluster[i];
             }
         }
     }
 
     // Attribution d'un niveau de gris à chaque groupe
-    for(int i=0; i<row; i++){
-        for(int j=0; j<col; j++){
-            clusters_point[i][j] = 255 * clusters_point[i][j]/(k-1);
+    for (int i = 0; i < row; i++)
+    {
+        for (int j = 0; j < col; j++)
+        {
+            clusters_point[i][j] = 255 * clusters_point[i][j] / (k - 1);
         }
     }
-    
+
     finTache("K-Means");
     writeImage("images/output/k-means.pgm", clusters_point, row, col);
+    free(mean_cluster);
+    free(distance_point_cluster);
+    free(sum_cluster_element);
+    free(taille_cluster);
     return clusters_point;
+}
+
+void division(int **matrix, int row, int col, int **matrice_division, int *nbre_gpe, int start_x, int start_y, int dim_x, int dim_y)
+{
+    if(dim_x > 1 || dim_y > 1){
+        
+    }
+    
+}
+
+int **division_fusion(int **matrix, int row, int col, int critere)
+{
+    //int **matrice_division = allocateMatrix(row, col);
+    int **result = allocateMatrix(row, col);
+
+    int nbre_gpe = 0;
+    return result;
 }
