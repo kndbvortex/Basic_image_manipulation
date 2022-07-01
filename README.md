@@ -14,7 +14,7 @@ Exemple d'exécution pour la transformation linéaire avec saturation(transAvecS
 ```
 
 <h2>Liste des arguments possibles </h2> 
-<ul>
+<ol>
 <li>histogramme image</li>
 <li>luminance image</li>
 <li>transLineaire image</li>
@@ -29,7 +29,7 @@ Exemple d'exécution pour la transformation linéaire avec saturation(transAvecS
 <li>multiplication image nombre</li>
 <li>addMultiplication image1 coef image2 coef2</li>
 <li>sousMultiplication image1 coef image2 coef2</li>
-<li>interploationSimple image rapport</li>
+<li>interpolationSimple image rapport</li>
 <li>interpolationBilineaire image rapport</li>
 <li>interpolationBicubique image rapport</li>
 <li>rotation image angle</li>
@@ -37,11 +37,12 @@ Exemple d'exécution pour la transformation linéaire avec saturation(transAvecS
 <li>filtreMoyenneur image rayon</li>
 <li>filtreGaussien image</li>
 <li>filtreMedian image taill</li>
+<li>contourRobert image [seuil]</li>
 <li>contourPrewit image [seuil]</li>
 <li>contourSobel image [seuil]</li>
 <li>contourLaplace image [seuil]</li>
 <li>hough image [seuil] [Nombre de point]</li>
-<li>binarisation image type [valeur]</li>
-<li>seuillageAdaptatif image nbre_carreau_ligne nbre_carreau_colonne // Pacman 3 2</li>
+<li>binarisation image [type:moyenne|mediane|otsu|normal] [si normal valeur]</li>
+<li>seuillageAdaptatif image nbre_carreau_ligne nbre_carreau_colonne [type:moy|otsu]// Pacman 3 2 otsu</li>
 <li>k-means image nbreCluster</li>
-</ul>
+</ol>

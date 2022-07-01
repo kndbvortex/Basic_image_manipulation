@@ -161,7 +161,7 @@ int main(int argc, char *argv[])
             free(matrix_image);
             free(matrix_image2);
         }
-        else if (strcmp(argv[1], "interploationSimple") == 0)
+        else if (strcmp(argv[1], "interpolationSimple") == 0)
         {
             int **matrix_image = readImage(argv[2], &rows, &columns);
             interpolationSimple(matrix_image, rows, columns, atof(argv[3]) * rows, atof(argv[3]) * columns);
@@ -234,6 +234,15 @@ int main(int argc, char *argv[])
             contour_sobel(matrix_image, rows, columns, seuil);
             free(matrix_image);
         }
+        else if (strcmp(argv[1], "contourRobert") == 0)
+        {
+            int **matrix_image = readImage(argv[2], &rows, &columns);
+            int seuil = -1;
+            if (argc >= 4)
+                seuil = atoi(argv[3]);
+            contour_robert(matrix_image, rows, columns, seuil);
+            free(matrix_image);
+        }
         else if (strcmp(argv[1], "contourLaplace") == 0)
         {
             int **matrix_image = readImage(argv[2], &rows, &columns);
@@ -280,13 +289,13 @@ int main(int argc, char *argv[])
                     seuil = tab[(max_image - min_image + 1) / 2].niveau_gris;
                     free(tab);
                 }
-                else if (strcmp(argv[3], "automatique") == 0)
+                else if (strcmp(argv[3], "otsu") == 0)
                 {
                     seuil = seuil_otsu(matrix_image, rows, columns, 0, 0);
                 }
-                
             }
-            else if (argc == 5){
+            else if (argc == 5)
+            {
                 seuil = atoi(argv[4]);
             }
             printf("Seuil = %d\n", seuil);
@@ -306,9 +315,10 @@ int main(int argc, char *argv[])
             free(matrix_image);
         }
     }
-    
+
     // int rows = 0, columns = 0, row2 = 0, col2 = 0, row3 = 0, col3 = 0;
-    // int **matrix_image = readImage("images/input/personne.pgm", &rows, &columns);
+    // int **matrix_image = readFilter("./test.txt", &rows, &columns);
+    // division_fusion(matrix_image, rows, columns, 2);
     // k_means(matrix_image, rows, columns, 4);
     // printf("%d\n", 207/52);
     // seuillage_adaptatif(matrix_image, rows, columns, 12, 20);

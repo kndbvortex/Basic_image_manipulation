@@ -24,4 +24,5 @@ float **readFloatFilter(char filename[], int *row, int *col);
 int min_vector(int *v, int taille);
 int indice_min_vector(int *v, int taille);
 void init_vector(int *v, int taille, int val);
+int puissance_2_suivante(int nbre);
 #endif

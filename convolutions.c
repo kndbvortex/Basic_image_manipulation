@@ -8,7 +8,7 @@
 // Convolution
 int **convolution(int **matrix_image, int row, int col, float **filtre, int row_filtre, int col_filtre)
 {
-    if (row_filtre % 2 == 0 || col_filtre % 2 == 0 || row_filtre != col_filtre)
+    if (row_filtre != col_filtre)
     {
         printf("Opération non implémentée pour les filtres de taille Pair");
         exit(EXIT_FAILURE);
@@ -52,7 +52,7 @@ int **convolution(int **matrix_image, int row, int col, float **filtre, int row_
     return result;
 }
 
-int** filtre_moyenneur(int **matrix_image, int row, int col, int rayon)
+int **filtre_moyenneur(int **matrix_image, int row, int col, int rayon)
 {
 
     int cote = 2 * rayon + 1;
@@ -265,6 +265,38 @@ void filtre_median(int **matrix_image, int row, int col, int row_filtre, int col
     writeImage("images/output/filtreMedian.pgm", result, row, col);
 }
 
+int **contour_robert(int **matrix, int row, int col, int seuil)
+{
+    int col_f = 0, row_f = 0;
+    float **s_x = readFloatFilter("filtres/robert_x.txt", &row_f, &col_f);
+    float **s_y = readFloatFilter("filtres/robert_y.txt", &row_f, &col_f);
+    int **Gx = convolution(matrix, row, col, s_x, row_f, col_f);
+    int **Gy = convolution(matrix, row, col, s_y, row_f, col_f);
+    int **sobel = allocateMatrix(row, col);
+    for (int i = 0; i < row; i++)
+    {
+        for (int j = 0; j < col; j++)
+        {
+            sobel[i][j] = Gx[i][j] + Gy[i][j];
+            if (sobel[i][j] > 255)
+            {
+                sobel[i][j] = 255;
+            }
+            if (seuil != -1)
+            {
+                if (sobel[i][j] >= seuil)
+                    sobel[i][j] = 255;
+                else
+                    sobel[i][j] = 0;
+            }
+        }
+    }
+    writeImage("images/output/robert.pgm", sobel, row, col);
+    free(Gx);
+    free(Gy);
+    return sobel;
+}
+
 int **contour_sobel(int **matrix, int row, int col, int seuil)
 {
     int col_f = 0, row_f = 0;
@@ -404,18 +436,50 @@ void transformee_hough(int **matrix, int row, int col, int seuil, int seuil_vote
                     int a = vote[rho][theta];
                     if (a >= val_acc[seuil_vote - 1])
                     {
-                        int s = 0;
-                        while (val_acc[s] > a)
-                            s++;
-                        for (int alpha = seuil_vote - 1; alpha < s; alpha--)
+                        int present = 0, index = 0;
+                        for (int m = 0; m < seuil_vote; m++)
                         {
-                            val_acc[s] = val_acc[s - 1];
-                            indices_i_acc[s] = indices_i_acc[s - 1];
-                            indices_j_acc[s] = indices_j_acc[s - 1];
+                            if (rho == indices_i_acc[m] && theta == indices_j_acc[m])
+                            {
+                                present = 1;
+                                index = m;
+                            }
                         }
-                        val_acc[s] = a;
-                        indices_i_acc[s] = rho;
-                        indices_j_acc[s] = theta;
+                        if (present == 1)
+                        {
+                            val_acc[index] = vote[rho][theta];
+                            for (int m = index; m > 0; m--)
+                            {
+                                if (val_acc[m] > val_acc[m - 1])
+                                {
+                                    int tmp = val_acc[m];
+                                    val_acc[m] = val_acc[m - 1];
+                                    val_acc[m - 1] = tmp;
+                                    tmp = indices_i_acc[m];
+                                    indices_i_acc[m] = indices_i_acc[m - 1];
+                                    indices_i_acc[m - 1] = tmp;
+
+                                    tmp = indices_j_acc[m];
+                                    indices_j_acc[m] = indices_j_acc[m - 1];
+                                    indices_j_acc[m - 1] = tmp;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            int s = 0;
+                            while (val_acc[s] > a)
+                                s++;
+                            for (int alpha = seuil_vote - 1; alpha < s; alpha--)
+                            {
+                                val_acc[s] = val_acc[s - 1];
+                                indices_i_acc[s] = indices_i_acc[s - 1];
+                                indices_j_acc[s] = indices_j_acc[s - 1];
+                            }
+                            val_acc[s] = a;
+                            indices_i_acc[s] = rho;
+                            indices_j_acc[s] = theta;
+                        }
                     }
                 }
             }
@@ -423,8 +487,14 @@ void transformee_hough(int **matrix, int row, int col, int seuil, int seuil_vote
     }
 
     int y = 0;
+    for (int i = 0; i < seuil_vote; i++)
+    {
+        printf("Point(%d, %d)\n", indices_i_acc[i], indices_j_acc[i]);
+    }
+    
 
-    for(int i=0; i<seuil_vote; i++){
+    for (int i = 0; i < seuil_vote; i++)
+    {
         for (int k = 0; k < row; k++)
         {
             if (sin_angle[indices_j_acc[i]] != 0)
@@ -437,26 +507,7 @@ void transformee_hough(int **matrix, int row, int col, int seuil, int seuil_vote
             }
         }
     }
-    // for (int i = 0; i < 2 * val_max_rho; i++)
-    // {
-    //     for (int j = 0; j < val_angles; j++)
-    //     {
-    //         if (vote[i][j] != 0)
-    //         {
-    //             for (int k = 0; k < row; k++)
-    //             {
-    //                 if (sin_angle[j] != 0)
-    //                 {
-    //                     y = (-1 * cos_angle[j] * k + (i - val_max_rho)) / sin_angle[j];
-    //                     if (y >= 0 && y < col)
-    //                     {
-    //                         result[k][y] = 255;
-    //                     }
-    //                 }
-    //             }
-    //         }
-    //     }
-    // }
+    writeImage("images/output/contourHough.pgm", result, row, col);
     writeImage("images/output/accumulation.pgm", vote_a, 2 * val_max_rho, val_angles);
     addition(matrix, row, col, result, row, col);
 }

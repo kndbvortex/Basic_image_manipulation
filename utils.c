@@ -185,7 +185,7 @@ void writeHistogram(int hist[], int m)
             result[i][j] = 0;
     for (int j = 0; j < 256; j++)
     {
-        for (int i = m - hist[j]; i < m; i++)
+        for (int i = m - 1; i >= m-hist[j]; i--)
             result[i][j] = 255;
     }
     writeImage("images/output/histogram.pgm", result, m, 256);
@@ -281,4 +281,12 @@ void init_vector(int *v, int taille, int val)
     {
         v[i] = val;
     }
+}
+
+int puissance_2_suivante(int nbre)
+{
+    int b = nbre;
+    while ((int)log2(b) != log2(b))
+        b++;
+    return b;
 }

@@ -627,7 +627,7 @@ void interpolationSimple(int **matrix_image, int row, int col, int new_row, int 
     writeImage("images/output/interpolation.pgm", result, new_row, new_col);
 }
 
-void interpolationBilineaire(int **matrix_image, int row, int col, int new_row, int new_col)
+int **interpolationBilineaire(int **matrix_image, int row, int col, int new_row, int new_col)
 {
     int **result = ratioImage(matrix_image, row, col, new_row, new_col);
 
@@ -677,6 +677,7 @@ void interpolationBilineaire(int **matrix_image, int row, int col, int new_row, 
     }
     finTache("Interpolation Bilinéaire");
     writeImage("images/output/interpolationBiléaire.pgm", result, new_row, new_col);
+    return result;
 }
 
 void interpolationBicubique(int **matrix_image, int row, int col, int new_row, int new_col)
@@ -820,9 +821,11 @@ int **k_means(int **matrix, int row, int col, int k)
         exit(EXIT_FAILURE);
     }
     int *mean_cluster = allocateVector(k);
+    int *ancien_centre = allocateVector(k);
     int *taille_cluster = allocateVector(k);
     int *sum_cluster_element = allocateVector(k);
     int *distance_point_cluster = allocateVector(k);
+    int cpt = 0;
 
     int min_image = min(matrix, row, col), max_image = max(matrix, row, col);
     // Initialisation des clusters
@@ -865,12 +868,20 @@ int **k_means(int **matrix, int row, int col, int k)
         // Recalcule des centres
         for (int i = 0; i < k; i++)
         {
+            ancien_centre[i] = mean_cluster[i];
             mean_cluster[i] = sum_cluster_element[i];
             if (taille_cluster[i] != 0)
             {
                 mean_cluster[i] /= taille_cluster[i];
             }
         }
+        cpt=0;
+        for(int i=0; i<k; i++){
+            if(ancien_centre[i] == mean_cluster[i])
+                cpt++;
+        }
+        if(cpt == k)
+            break;
     }
 
     // Attribution d'un niveau de gris à chaque groupe
@@ -884,6 +895,7 @@ int **k_means(int **matrix, int row, int col, int k)
 
     finTache("K-Means");
     writeImage("images/output/k-means.pgm", clusters_point, row, col);
+    
     free(mean_cluster);
     free(distance_point_cluster);
     free(sum_cluster_element);
@@ -891,19 +903,81 @@ int **k_means(int **matrix, int row, int col, int k)
     return clusters_point;
 }
 
-void division(int **matrix, int row, int col, int **matrice_division, int *nbre_gpe, int start_x, int start_y, int dim_x, int dim_y)
+int row_div_init;
+int col_div_init;
+int nbre_grpe;
+
+void division(int **matrix, int **matrice_division, int start_x, int start_y, int dim_x, int dim_y, int critere)
 {
-    if(dim_x > 1 || dim_y > 1){
-        
+    printf("Point(%d, %d) dim_x=%d dim_y=%d\n", start_x, start_y, dim_x, dim_y);
+    if (dim_x == 1 && dim_y == 1)
+    {
+        printf("Start Base cae\n");
+        nbre_grpe = nbre_grpe + 1;
+        if (start_x < row_div_init && start_y < col_div_init)
+            matrice_division[start_x][start_y] = nbre_grpe;
+        printf("End Base case\n");
     }
-    
+    else
+    {
+        int min_section = 256, max_section = -1;
+        for (int i = start_x; i < start_x + dim_x; i++)
+        {
+            for (int j = start_y; j < start_y + dim_y; j++)
+            {
+                printf("Debut %d; %d\n", i, j);
+                if (i < row_div_init && j < col_div_init)
+                {
+                    if (min_section > matrix[i][j])
+                        min_section = matrix[i][j];
+                    if (max_section < matrix[i][j])
+                        max_section = matrix[i][j];
+                }
+                printf("fin\n");
+            }
+        }
+        if (max_section - min_section <= critere)
+        {
+            nbre_grpe = nbre_grpe + 1;
+            for (int i = start_x; i < start_x + dim_x; i++)
+            {
+                for (int j = start_y; j < start_y + dim_y; j++)
+                {
+                    if (i < row_div_init && j < col_div_init)
+                        matrice_division[i][j] = nbre_grpe;
+                }
+            }
+        }
+        else
+        {
+            division(matrix, matrice_division, start_x, start_y, dim_x / 2, dim_y / 2, critere);
+            division(matrix, matrice_division, start_x + dim_x, start_y, dim_x / 2, dim_y / 2, critere);
+            division(matrix, matrice_division, start_x, start_y + dim_y, dim_x / 2, dim_y / 2, critere);
+            division(matrix, matrice_division, start_x + dim_x, start_y + dim_y, dim_x / 2, dim_y / 2, critere);
+        }
+    }
 }
 
 int **division_fusion(int **matrix, int row, int col, int critere)
 {
-    //int **matrice_division = allocateMatrix(row, col);
-    int **result = allocateMatrix(row, col);
+    // int **matrice_division = allocateMatrix(row, col);
+    int new_row = puissance_2_suivante(row);
+    int new_col = puissance_2_suivante(col);
+    if (new_row > new_col)
+        new_col = new_row;
+    else
+        new_row = col;
 
-    int nbre_gpe = 0;
+    row_div_init = new_row;
+    col_div_init = new_col;
+    int **m = interpolationBilineaire(matrix, row, col, new_row, new_col);
+    int **result = allocateMatrix(new_row, new_col);
+    nbre_grpe = 0;
+    printf("Avant la récursion\n");
+    division(m, result, 0, 0, new_row, new_col, critere);
+    printf("Après la récursion\n");
+    writeImage("images/output/test-division.pgm", result, new_row, new_col);
+    printf("Resultat: \n");
+    printMatrix(result, new_row, new_col);
     return result;
 }

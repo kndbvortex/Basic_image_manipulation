@@ -46,7 +46,7 @@ int **multiplication(int **matrix_image, int row1, int col1, float ratio);
 
 // Opération d'interpolation
 void interpolationSimple(int **matrix_image, int row, int col, int new_row, int new_col);
-void interpolationBilineaire(int **matrix_image, int row, int col, int new_row, int new_col);
+int** interpolationBilineaire(int **matrix_image, int row, int col, int new_row, int new_col);
 void interpolationBicubique(int **matrix_image, int row, int col, int new_row, int new_col);
 
 // à terminer
